@@ -1,0 +1,8 @@
+.env
+.DS_Store
+*.log
+
+# Local WordPress data (stored in Docker volumes, not in repo)
+wordpress/
+wp-content/
+!wp-content/themes/sos-beauty/
