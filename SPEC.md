@@ -50,11 +50,11 @@ V8: header → cart link `/cart` + live `items_count` badge when `items_count > 
 | id  | status | task                                                                     | cites    |
 | --- | ------ | ------------------------------------------------------------------------ | -------- |
 | T1  | x      | wire `store-api.ts`: fetch/add/update/remove + token r/w                 | V1,V2,I  |
-| T2  | ~      | hooks `use-cart.ts`: query + mutations, cache sync on success            | V3,V7,I  |
-| T3  | .      | `AddToCartButton` on product detail + product cards (shop/category/home) | V6,V7,I  |
-| T4  | .      | `/cart` page + `CartView`: list, qty +/-, remove, total, empty state     | V4,V5,I  |
-| T5  | .      | header cart badge from `useCart` / `items_count`                         | V8,I     |
-| T6  | .      | manual e2e: add from `/shop` → `/cart` shows item + correct total        | V1,V3,V4 |
+| T2  | x      | hooks `use-cart.ts`: query + mutations, cache sync on success            | V3,V7,I  |
+| T3  | x      | `AddToCartButton` on product detail + product cards (shop/category/home) | V6,V7,I  |
+| T4  | x      | `/cart` page + `CartView`: list, qty +/-, remove, total, empty state     | V4,V5,I  |
+| T5  | x      | header cart badge from `useCart` / `items_count`                         | V8,I     |
+| T6  | x      | manual e2e: add from `/shop` → `/cart` shows item + correct total        | V1,V3,V4 |
 
 ## §B
 
