@@ -1,21 +1,15 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro, Lora } from "next/font/google";
+import { Quicksand } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Providers } from "@/components/providers";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
-const lora = Lora({
-  variable: "--font-lora",
+const quicksand = Quicksand({
+  variable: "--font-quicksand",
   subsets: ["latin", "vietnamese"],
-  weight: ["500", "600"],
-});
-
-const beVietnam = Be_Vietnam_Pro({
-  variable: "--font-be-vietnam",
-  subsets: ["latin", "vietnamese"],
-  weight: ["400", "500", "600"],
+  weight: ["500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -33,12 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="vi"
-      className={cn(lora.variable, beVietnam.variable)}
-      suppressHydrationWarning
-    >
-      <body className="min-h-screen font-[family-name:var(--font-be-vietnam)] antialiased">
+    <html lang="vi" className={cn(quicksand.variable)} suppressHydrationWarning>
+      <body className="min-h-screen font-(family-name:--font-quicksand) antialiased">
         <Providers>
           <Header />
           <main>{children}</main>

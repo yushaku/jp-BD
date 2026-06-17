@@ -1,0 +1,53 @@
+---
+description: Mobile-first responsive styling với Tailwind
+globs: frontend/**/*.{tsx,css}
+alwaysApply: false
+---
+
+# Mobile-first responsive
+
+Thiết kế **mobile trước**, mở rộng lên tablet/desktop bằng breakpoint prefix. Dùng Tailwind — base class = màn nhỏ nhất.
+
+## Breakpoints (Tailwind mặc định)
+
+| Prefix   | Min width | Dùng cho                 |
+| -------- | --------- | ------------------------ |
+| _(none)_ | 0px       | Mobile — **viết trước**  |
+| `sm:`    | 640px     | Điện thoại lớn / phablet |
+| `md:`    | 768px     | Tablet                   |
+| `lg:`    | 1024px    | Desktop                  |
+
+## Quy tắc
+
+1. **Base = mobile**: layout 1 cột, `w-full`, padding vừa tay (`px-6`), không ẩn nội dung chính trên mobile
+2. **Scale up**: thêm cột / flex row / hiện nav chỉ ở breakpoint lớn hơn — `md:grid-cols-3`, `md:flex`, `lg:grid-cols-2`
+3. **Tránh desktop-first**: không viết layout desktop rồi `max-md:` để sửa lại mobile
+4. **Typography**: ưu tiên `text-sm` / `text-base` trên mobile; `md:text-lg` khi cần. Heading dùng `clamp()` nếu cần scale mượt
+5. **Touch**: nút/link đủ vùng bấm (`py-3`, `min-h-10`); form field `w-full` trên mobile
+6. **Spacing**: `gap-4` → `md:gap-6` / `lg:gap-8` khi màn rộng hơn
+
+## Ví dụ
+
+```tsx
+// ✅ GOOD — mobile 1 cột, tablet 2, desktop 3
+<div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+// ✅ GOOD — full width mobile, auto desktop
+<Button className="w-full sm:w-auto" />
+
+// ✅ GOOD — nav ẩn mobile, hiện từ tablet
+<nav className="hidden md:flex" />
+
+// ❌ BAD — desktop-first
+<div className="grid grid-cols-3 max-md:grid-cols-1">
+```
+
+## Pattern trong project
+
+- Container: `mx-auto max-w-6xl px-6`
+- Grid sản phẩm: `grid gap-6 sm:grid-cols-2 lg:grid-cols-4`
+- Layout 2 cột (product, cart): `grid gap-8 lg:grid-cols-2` hoặc `lg:grid-cols-[1fr_320px]`
+
+## Màu sắc
+
+Chỉ dùng token trong `frontend/app/globals.css` (`jp-*`, shadcn theme) — không hardcode hex.

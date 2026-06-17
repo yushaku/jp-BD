@@ -3,11 +3,10 @@ import { getMenu } from "@/lib/sos-api";
 import { siteUrl } from "@/lib/config";
 
 const FALLBACK_NAV = [
-  { href: "/", label: "Trang chủ" },
   { href: "/shop", label: "Cửa hàng" },
-  { href: "/category/thuc-pham-nhat", label: "Thực phẩm Nhật" },
-  { href: "/category/my-pham-nhat", label: "Mỹ phẩm" },
-  { href: "/category/tpcn", label: "TPCN" },
+  { href: "/tin-tuc", label: "Tin tức" },
+  { href: "/gioi-thieu", label: "Giới thiệu" },
+  { href: "/lien-he", label: "Liên hệ" },
 ];
 
 function mapMenuUrl(url: string): string {
@@ -28,12 +27,9 @@ export async function Header() {
       : FALLBACK_NAV;
 
   return (
-    <header className="sticky top-0 z-50 border-b border-jp-border bg-jp-cream shadow-[var(--jp-shadow)]">
+    <header className="sticky top-0 z-50 border-b border-jp-border bg-jp-cream shadow-(--jp-shadow)">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
-        <Link
-          href="/"
-          className="font-[family-name:var(--font-lora)] text-lg font-semibold text-jp-ink"
-        >
+        <Link href="/" className="text-lg font-semibold text-jp-ink">
           JP Bùi Đặng
         </Link>
         <nav className="hidden items-center gap-1 md:flex">

@@ -95,7 +95,9 @@ services:
       - cli
 
   nextjs:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -105,14 +107,27 @@ services:
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       WC_CONSUMER_KEY: ${WC_CONSUMER_KEY:-}
       WC_CONSUMER_SECRET: ${WC_CONSUMER_SECRET:-}
+      WATCHPACK_POLLING: "true"
+      CHOKIDAR_USEPOLLING: "true"
+      CI: "true"
+    volumes:
+      - ./frontend:/app
+      - nextjs_node_modules:/app/node_modules
     depends_on:
       - wordpress
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
     networks:
       - wpnet
 
 volumes:
   db_data:
   wordpress_data:
+  nextjs_node_modules:
 
 networks:
   wpnet:

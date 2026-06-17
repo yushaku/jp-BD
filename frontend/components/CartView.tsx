@@ -130,7 +130,7 @@ export function CartView() {
 
       <Card className="h-fit border-jp-border bg-jp-cream">
         <CardHeader>
-          <CardTitle className="font-[family-name:var(--font-lora)]">
+          <CardTitle>
             Tổng cộng
           </CardTitle>
           <CardDescription>

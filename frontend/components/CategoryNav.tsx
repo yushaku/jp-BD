@@ -17,9 +17,9 @@ export function CategoryNav({ categories }: { categories: CategoryCard[] }) {
         <Link
           key={cat.slug}
           href={`/category/${cat.slug}`}
-          className={`block rounded-[var(--jp-radius)] border border-jp-border border-t-[3px] bg-jp-cream p-7 text-center shadow-[var(--jp-shadow)] transition hover:-translate-y-0.5 ${borderColors[cat.variant]}`}
+          className={`block rounded-(--jp-radius) border border-jp-border border-t-[3px] bg-jp-cream p-7 text-center shadow-(--jp-shadow) transition hover:-translate-y-0.5 ${borderColors[cat.variant]}`}
         >
-          <span className="mb-1 block font-[family-name:var(--font-lora)] text-2xl font-semibold text-jp-muted opacity-70">
+          <span className="mb-1 block text-2xl font-semibold text-jp-muted opacity-70">
             {cat.kanji}
           </span>
           <span className="block text-sm font-semibold tracking-wide">

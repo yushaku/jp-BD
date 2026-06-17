@@ -22,7 +22,7 @@ export function TrustBadges() {
     <section className="mt-12 grid gap-6 border-t border-jp-border bg-jp-cream px-6 py-10 text-center sm:grid-cols-2 lg:grid-cols-4">
       {items.map((item) => (
         <div key={item.title}>
-          <strong className="mb-1 block font-[family-name:var(--font-lora)] text-[1.05rem] text-jp-ink">
+          <strong className="mb-1 block text-[1.05rem] text-jp-ink">
             {item.title}
           </strong>
           <span className="text-sm text-jp-muted">{item.desc}</span>

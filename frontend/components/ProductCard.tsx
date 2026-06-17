@@ -12,13 +12,11 @@ export function ProductCard({ product }: { product: WcProduct }) {
   const volume = getVolume(product);
 
   return (
-    <Card className="overflow-hidden border-jp-border bg-jp-cream py-0 shadow-[var(--jp-shadow)] transition hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(26,26,26,0.1)]">
+    <Card className="overflow-hidden border-jp-border bg-jp-cream py-0 shadow-(--jp-shadow) transition hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(26,26,26,0.1)]">
       <Link href={`/product/${product.slug}`}>
         <div className="relative aspect-square bg-white">
           {product.on_sale && (
-            <Badge className="absolute left-2 top-2 z-10 uppercase">
-              Sale
-            </Badge>
+            <Badge className="absolute left-2 top-2 z-10 uppercase">Sale</Badge>
           )}
           {image ? (
             <Image
@@ -35,9 +33,7 @@ export function ProductCard({ product }: { product: WcProduct }) {
           )}
         </div>
         <CardContent className="pt-4">
-          <h3 className="font-[family-name:var(--font-lora)] text-[1.05rem] font-semibold">
-            {product.name}
-          </h3>
+          <h3 className="text-[1.05rem] font-semibold">{product.name}</h3>
           {volume && (
             <span className="mt-1 block text-xs text-muted-foreground">
               {volume}

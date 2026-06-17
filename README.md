@@ -27,11 +27,14 @@ WC_CONSUMER_KEY=ck_...
 WC_CONSUMER_SECRET=cs_...
 ```
 
-Khởi động Next.js (Docker):
+Khởi động Next.js (Docker, hot reload):
 
 ```bash
 docker compose up -d nextjs
+docker compose logs -f nextjs
 ```
+
+Source `frontend/` được mount vào container — sửa code → tự reload. Production image: `frontend/Dockerfile`.
 
 Hoặc dev local:
 
@@ -123,7 +126,7 @@ Plugin `payment-gateway-mo-mo-for-woocommerce` đã được cài tự động. 
 docker compose logs -f wordpress
 docker compose logs -f nextjs
 
-# Rebuild frontend
+# Rebuild frontend dev image (sau khi đổi package.json)
 docker compose build nextjs && docker compose up -d nextjs
 
 # Backup database

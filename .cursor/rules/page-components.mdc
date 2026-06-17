@@ -1,0 +1,48 @@
+---
+description: Page-specific components live in app/<route>/components/
+globs: frontend/app/**/*
+alwaysApply: false
+---
+
+# Page-local components
+
+Components used by **one page only** must live in that page's `components/` folder — not in the shared `frontend/components/` tree.
+
+## Structure
+
+```
+frontend/app/<route>/
+  page.tsx
+  components/          # chỉ dùng cho page này
+    Hero.tsx
+    ContactForm.tsx
+```
+
+## Shared vs page-local
+
+| Vị trí                             | Khi nào dùng                                                     |
+| ---------------------------------- | ---------------------------------------------------------------- |
+| `frontend/app/<route>/components/` | Component chỉ render trên page đó, không import ở page khác      |
+| `frontend/components/`             | Header, Footer, UI primitives, hoặc component dùng chung ≥2 page |
+
+## Import
+
+Import page-local components bằng relative path từ `page.tsx`:
+
+```tsx
+// ✅ GOOD — lien-he/page.tsx
+import { ContactForm } from "./components/ContactForm";
+
+// ❌ BAD — component chỉ dùng 1 page nhưng đặt ở shared
+import { ContactForm } from "@/components/ContactForm";
+```
+
+## Khi tách component mới
+
+1. Chỉ dùng trên 1 route → `app/<route>/components/<Name>.tsx`
+2. Dùng lại ở page khác → chuyển lên `frontend/components/`
+3. Logic thuần (không UI) có thể colocate: `app/<route>/lib/` hoặc `frontend/lib/` nếu shared
+
+## Ví dụ
+
+`frontend/app/lien-he/components/` chứa `ContactForm`, `ContactInfo`, `ContactSupport` — không share sang page khác.
