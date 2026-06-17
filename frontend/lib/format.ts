@@ -29,3 +29,13 @@ export function truncate(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
   return `${text.slice(0, maxLength).trimEnd()}…`;
 }
+
+export function getSalePercent(
+  regularPrice: string,
+  salePrice: string,
+): number | null {
+  const regular = parseFloat(regularPrice);
+  const sale = parseFloat(salePrice);
+  if (!regular || !sale || sale >= regular) return null;
+  return Math.round((1 - sale / regular) * 100);
+}

@@ -1,5 +1,6 @@
 import { wpApiUrl } from "./config";
-import type { HeroData, MenuItem } from "./types";
+import { DEFAULT_BANNER_SLIDES } from "./home-banners";
+import type { BannerSlide, HeroData, MenuItem } from "./types";
 
 const HERO_REVALIDATE = 300;
 
@@ -26,6 +27,15 @@ export async function getHero(): Promise<HeroData> {
         "Nguồn hàng Nhật Bản uy tín — thực phẩm tươi lành, J-Beauty và thực phẩm bổ sung an toàn.",
       cta: "Khám phá ngay",
     };
+  }
+}
+
+export async function getBannerSlides(): Promise<BannerSlide[]> {
+  try {
+    const slides = await sosFetch<BannerSlide[]>("/banners");
+    return slides.length > 0 ? slides : DEFAULT_BANNER_SLIDES;
+  } catch {
+    return DEFAULT_BANNER_SLIDES;
   }
 }
 

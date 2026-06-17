@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
@@ -64,13 +63,13 @@ export default async function NewsArticlePage({
 
       {image && (
         <div className="relative mb-8 aspect-16/10 overflow-hidden rounded-(--jp-radius) bg-jp-paper">
-          <Image
+          <img
             src={image.source_url}
             alt={image.alt_text || title}
-            fill
-            className="object-cover"
-            priority
-            sizes="(max-width: 768px) 100vw, 768px"
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            className="absolute inset-0 size-full object-cover"
           />
         </div>
       )}

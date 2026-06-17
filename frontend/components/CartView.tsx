@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -61,11 +60,12 @@ export function CartView() {
               <CardContent className="flex gap-4">
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-white">
                   {item.images[0] && (
-                    <Image
+                    <img
                       src={item.images[0].src}
                       alt={item.images[0].alt || item.name}
-                      fill
-                      className="object-cover"
+                      loading="lazy"
+                      decoding="async"
+                      className="size-full object-cover"
                     />
                   )}
                 </div>

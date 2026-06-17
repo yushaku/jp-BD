@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -36,12 +35,12 @@ function BestsellerCard({
             </Badge>
           )}
           {image ? (
-            <Image
+            <img
               src={image.src}
               alt={image.alt || product.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 50vw, 25vw"
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 size-full object-cover"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-muted-foreground">

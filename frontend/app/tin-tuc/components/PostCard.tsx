@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDate, stripHtml, truncate } from "@/lib/format";
@@ -17,8 +16,9 @@ export function PostCard({ post }: { post: WpPost }) {
             <img
               src={image.source_url}
               alt={image.alt_text || stripHtml(post.title.rendered)}
-              className="w-full h-full object-cover"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 size-full object-cover"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-sm text-jp-muted">

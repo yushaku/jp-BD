@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -12,57 +11,73 @@ export function ProductCard({ product }: { product: WcProduct }) {
   const volume = getVolume(product);
 
   return (
-    <Card className="overflow-hidden border-jp-border bg-jp-cream py-0 shadow-(--jp-shadow) transition hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(26,26,26,0.1)]">
-      <Link href={`/product/${product.slug}`}>
-        <div className="relative aspect-square bg-white">
+    <Card className="flex h-full flex-col overflow-hidden border-jp-border bg-jp-cream py-0 shadow-(--jp-shadow) transition hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(26,26,26,0.1)]">
+      <Link href={`/product/${product.slug}`} className="flex flex-1 flex-col">
+        <div className="relative aspect-4/5 overflow-hidden bg-white">
           {product.on_sale && (
-            <Badge className="absolute left-2 top-2 z-10 uppercase">Sale</Badge>
+            <Badge className="absolute left-1.5 top-1.5 z-10 text-[0.6rem] uppercase sm:left-2 sm:top-2 sm:text-xs">
+              Sale
+            </Badge>
           )}
           {image ? (
-            <Image
+            <img
               src={image.src}
               alt={image.alt || product.name}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 50vw, 25vw"
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 size-full object-cover transition-transform duration-300 group-hover/card:scale-[1.03]"
             />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            <div className="flex h-full items-center justify-center px-2 text-center text-xs text-muted-foreground sm:text-sm">
               Không có ảnh
             </div>
           )}
         </div>
-        <CardContent className="pt-4">
-          <h3 className="text-[1.05rem] font-semibold">{product.name}</h3>
+        <CardContent className="flex flex-1 flex-col px-3 pt-3 pb-2 sm:px-4 sm:pt-4">
+          <h3 className="line-clamp-2 text-sm leading-snug font-semibold sm:text-[1.05rem]">
+            {product.name}
+          </h3>
           {volume && (
-            <span className="mt-1 block text-xs text-muted-foreground">
+            <span className="mt-1 block text-[0.65rem] text-muted-foreground sm:text-xs">
               {volume}
             </span>
           )}
-          <p className="mt-2 text-[0.95rem] font-semibold text-jp-indigo">
+          <p className="mt-auto pt-2 text-sm font-semibold text-jp-indigo sm:text-[0.95rem]">
             {formatPrice(product.price)}
           </p>
         </CardContent>
       </Link>
-      <CardFooter className="border-0 bg-transparent pt-0">
+      <CardFooter className="border-0 bg-transparent px-3 pt-0 pb-3 sm:px-4 sm:pb-4">
         <AddToCartButton
           productId={product.id}
           stockStatus={product.stock_status}
+          className="h-8 w-full text-[0.65rem] uppercase tracking-wide sm:h-9 sm:text-xs"
         />
       </CardFooter>
     </Card>
   );
 }
 
-export function ProductGrid({ products }: { products: WcProduct[] }) {
+export function ProductGrid({
+  products,
+  columns = "default",
+}: {
+  products: WcProduct[];
+  columns?: "default" | "shop";
+}) {
   if (products.length === 0) {
     return (
       <p className="text-center text-muted-foreground">Chưa có sản phẩm nào.</p>
     );
   }
 
+  const gridClassName =
+    columns === "shop"
+      ? "grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-5"
+      : "grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6";
+
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className={gridClassName}>
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}

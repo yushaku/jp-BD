@@ -1,11 +1,11 @@
 "use client";
 
-import { wpPublicUrl } from "./config";
+import { wpSosApiBase, wpStoreApiBase } from "./config";
 import type { StoreCart } from "./types";
 
 const CART_TOKEN_KEY = "wc_cart_token";
 const STORE_NONCE_KEY = "wc_store_nonce";
-const STORE_BASE = `${wpPublicUrl}/wp-json/wc/store/v1`;
+const STORE_BASE = wpStoreApiBase;
 
 export function getCartToken(): string | null {
   if (typeof window === "undefined") return null;
@@ -118,7 +118,7 @@ export async function checkoutHandoff(): Promise<string> {
     throw new Error("Giỏ hàng trống.");
   }
 
-  const res = await fetch(`${wpPublicUrl}/wp-json/sos/v1/checkout-handoff`, {
+  const res = await fetch(`${wpSosApiBase}/checkout-handoff`, {
     method: "POST",
     credentials: "include",
     headers: {

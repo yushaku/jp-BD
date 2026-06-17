@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import { AddToCartButton } from "@/components/AddToCartButton";
 import { ProductTabs } from "@/components/ProductTabs";
@@ -68,13 +67,13 @@ export default async function ProductPage({
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="relative aspect-square overflow-hidden rounded-[var(--jp-radius)] border border-jp-border bg-white">
           {image ? (
-            <Image
+            <img
               src={image.src}
               alt={image.alt || product.name}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              className="absolute inset-0 size-full object-cover"
             />
           ) : (
             <div className="flex h-full items-center justify-center text-jp-muted">

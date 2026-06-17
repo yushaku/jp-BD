@@ -16,6 +16,7 @@ export interface WcCategory {
   slug: string;
   description: string;
   count: number;
+  parent: number;
   image: WcImage | null;
 }
 
@@ -49,6 +50,13 @@ export interface HeroData {
   title: string;
   subtitle: string;
   cta: string;
+}
+
+export interface BannerSlide {
+  id: string;
+  src: string;
+  alt: string;
+  href?: string;
 }
 
 export interface MenuItem {

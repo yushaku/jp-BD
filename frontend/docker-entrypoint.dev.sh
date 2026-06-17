@@ -10,8 +10,8 @@ if [ ! -d node_modules/next ] && [ -d /opt/node_modules ]; then
   cp -a /opt/node_modules/. node_modules/
 fi
 
-# Install only when lockfile changed or deps missing.
-if [ ! -d node_modules/next ] || [ package.json -nt node_modules/.deps-stamp ] || [ pnpm-lock.yaml -nt node_modules/.deps-stamp ]; then
+# Install when lockfile changed or required deps missing from volume.
+if [ ! -d node_modules/next ] || [ ! -d node_modules/swiper ] || [ package.json -nt node_modules/.deps-stamp ] || [ pnpm-lock.yaml -nt node_modules/.deps-stamp ]; then
   echo "[dev] Installing dependencies..."
   pnpm install --frozen-lockfile --ignore-scripts
   touch node_modules/.deps-stamp

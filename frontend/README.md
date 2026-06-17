@@ -23,12 +23,12 @@ Mở http://localhost:3000
 
 ## Scripts
 
-| Lệnh | Mô tả |
-|------|-------|
-| `pnpm dev` | Dev server |
+| Lệnh         | Mô tả            |
+| ------------ | ---------------- |
+| `pnpm dev`   | Dev server       |
 | `pnpm build` | Production build |
-| `pnpm start` | Chạy build |
-| `pnpm lint` | ESLint |
+| `pnpm start` | Chạy build       |
+| `pnpm lint`  | ESLint           |
 
 ## Thêm shadcn component
 
