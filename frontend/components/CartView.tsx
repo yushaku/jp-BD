@@ -77,6 +77,13 @@ export function CartView() {
                       item.prices.currency_minor_unit,
                     )}
                   </p>
+                  <p className="text-sm text-jp-muted">
+                    Thành tiền:{" "}
+                    {formatPrice(
+                      item.totals.line_total,
+                      item.totals.currency_minor_unit,
+                    )}
+                  </p>
                   <div className="mt-2 flex items-center gap-2">
                     <Button
                       type="button"
