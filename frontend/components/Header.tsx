@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CartNavLink } from "@/components/CartNavLink";
 import { getMenu } from "@/lib/sos-api";
 import { siteUrl } from "@/lib/config";
 
@@ -44,12 +45,7 @@ export async function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-3">
-          <Link
-            href="/cart"
-            className="text-xs font-semibold uppercase tracking-wider text-jp-ink hover:text-jp-matcha"
-          >
-            Giỏ hàng
-          </Link>
+          <CartNavLink />
           <Link
             href="/account"
             className="hidden text-xs font-semibold uppercase tracking-wider text-jp-ink hover:text-jp-matcha sm:inline"
