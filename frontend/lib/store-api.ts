@@ -4,6 +4,7 @@ import { wpPublicUrl } from "./config";
 import type { StoreCart } from "./types";
 
 const CART_TOKEN_KEY = "wc_cart_token";
+const STORE_NONCE_KEY = "wc_store_nonce";
 const STORE_BASE = `${wpPublicUrl}/wp-json/wc/store/v1`;
 
 export function getCartToken(): string | null {
@@ -15,6 +16,15 @@ export function setCartToken(token: string): void {
   localStorage.setItem(CART_TOKEN_KEY, token);
 }
 
+export function getStoreNonce(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(STORE_NONCE_KEY);
+}
+
+export function setStoreNonce(nonce: string): void {
+  localStorage.setItem(STORE_NONCE_KEY, nonce);
+}
+
 function storeHeaders(token?: string | null): HeadersInit {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
@@ -22,6 +32,10 @@ function storeHeaders(token?: string | null): HeadersInit {
   const cartToken = token ?? getCartToken();
   if (cartToken) {
     headers["Cart-Token"] = cartToken;
+  }
+  const nonce = getStoreNonce();
+  if (nonce) {
+    headers["Nonce"] = nonce;
   }
   return headers;
 }
@@ -31,6 +45,10 @@ async function parseStoreResponse(res: Response): Promise<StoreCart> {
   if (newToken) {
     setCartToken(newToken);
   }
+  const newNonce = res.headers.get("Nonce");
+  if (newNonce) {
+    setStoreNonce(newNonce);
+  }
 
   if (!res.ok) {
     const body = await res.text();
@@ -38,6 +56,13 @@ async function parseStoreResponse(res: Response): Promise<StoreCart> {
   }
 
   return res.json() as Promise<StoreCart>;
+}
+
+async function ensureStoreSession(): Promise<void> {
+  if (getCartToken() && getStoreNonce()) {
+    return;
+  }
+  await fetchCart();
 }
 
 export async function fetchCart(): Promise<StoreCart> {
@@ -52,6 +77,7 @@ export async function addToCart(
   productId: number,
   quantity = 1,
 ): Promise<StoreCart> {
+  await ensureStoreSession();
   const res = await fetch(`${STORE_BASE}/cart/add-item`, {
     method: "POST",
     credentials: "include",
@@ -65,6 +91,7 @@ export async function updateCartItem(
   key: string,
   quantity: number,
 ): Promise<StoreCart> {
+  await ensureStoreSession();
   const res = await fetch(`${STORE_BASE}/cart/update-item`, {
     method: "POST",
     credentials: "include",
@@ -75,6 +102,7 @@ export async function updateCartItem(
 }
 
 export async function removeCartItem(key: string): Promise<StoreCart> {
+  await ensureStoreSession();
   const res = await fetch(`${STORE_BASE}/cart/remove-item`, {
     method: "POST",
     credentials: "include",

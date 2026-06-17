@@ -103,7 +103,10 @@ export default async function ProductPage({
             />
           )}
           <div className="mt-6 max-w-xs">
-            <AddToCartButton productId={product.id} />
+            <AddToCartButton
+              productId={product.id}
+              stockStatus={product.stock_status}
+            />
           </div>
           <div className="mt-6 border-t border-jp-border pt-4 text-sm text-jp-muted">
             Danh mục:{" "}

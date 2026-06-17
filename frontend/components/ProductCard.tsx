@@ -45,7 +45,10 @@ export function ProductCard({ product }: { product: WcProduct }) {
         </CardContent>
       </Link>
       <CardFooter className="border-0 bg-transparent pt-0">
-        <AddToCartButton productId={product.id} />
+        <AddToCartButton
+          productId={product.id}
+          stockStatus={product.stock_status}
+        />
       </CardFooter>
     </Card>
   );
