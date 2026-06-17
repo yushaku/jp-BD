@@ -32,6 +32,7 @@ services:
       WORDPRESS_DB_USER: ${MYSQL_USER}
       WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
       WORDPRESS_DEBUG: "1"
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_DEBUG_LOG', true);
         define('WP_DEBUG_DISPLAY', false);
@@ -39,6 +40,7 @@ services:
     volumes:
       - wordpress_data:/var/www/html
       - ./wp-content/themes/sos-beauty:/var/www/html/wp-content/themes/sos-beauty
+      - ./wp-content/plugins/sos-headless:/var/www/html/wp-content/plugins/sos-headless
     networks:
       - wpnet
 
@@ -84,12 +86,29 @@ services:
       - wordpress_data:/var/www/html
       - ./scripts:/scripts
       - ./wp-content/themes/sos-beauty:/var/www/html/wp-content/themes/sos-beauty
+      - ./wp-content/plugins/sos-headless:/var/www/html/wp-content/plugins/sos-headless
     user: "33:33"
     working_dir: /var/www/html
     networks:
       - wpnet
     profiles:
       - cli
+
+  nextjs:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      WORDPRESS_API_URL: http://wordpress:80
+      NEXT_PUBLIC_WP_URL: ${NEXT_PUBLIC_WP_URL:-http://localhost:8080}
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+      WC_CONSUMER_KEY: ${WC_CONSUMER_KEY:-}
+      WC_CONSUMER_SECRET: ${WC_CONSUMER_SECRET:-}
+    depends_on:
+      - wordpress
+    networks:
+      - wpnet
 
 volumes:
   db_data:

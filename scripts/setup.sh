@@ -63,6 +63,13 @@ install_plugins_and_theme() {
     log "VNPay zip not found at scripts/plugins/vnpay-woocommerce.zip — download from https://sandbox.vnpayment.vn/apis/docs/open/woocommerce/ and re-run setup."
   fi
 
+  if $WP plugin is-installed sos-headless 2>/dev/null; then
+    $WP plugin activate sos-headless || log "SOS Headless plugin activation failed."
+    log "Activated SOS Headless plugin."
+  else
+    log "Plugin sos-headless not found — mount wp-content/plugins/sos-headless and re-run setup."
+  fi
+
   $WP theme install storefront --activate
   if $WP theme is-installed sos-beauty 2>/dev/null; then
     $WP theme activate sos-beauty
@@ -278,11 +285,63 @@ create_beauty_product() {
 }
 
 finalize() {
+  create_wc_api_keys
   $WP rewrite flush --hard
   $WP cache flush 2>/dev/null || true
   log "Setup complete."
   log "Store: $URL"
   log "Admin: $URL/wp-admin (user: $ADMIN_USER)"
+  log "Next.js storefront: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}"
+}
+
+create_wc_api_keys() {
+  log "Ensuring WooCommerce REST API keys for Next.js..."
+  $WP eval '
+    if ( ! class_exists( "WooCommerce" ) ) {
+      echo "WooCommerce not active.\n";
+      return;
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . "woocommerce_api_keys";
+    $desc  = "SOS Headless Next.js";
+    $existing = $wpdb->get_row( $wpdb->prepare( "SELECT key_id, consumer_key FROM {$table} WHERE description = %s LIMIT 1", $desc ) );
+
+    if ( $existing ) {
+      echo "REST API key already exists (description: {$desc}).\n";
+      echo "Use WC_CONSUMER_KEY and WC_CONSUMER_SECRET from your .env file.\n";
+      return;
+    }
+
+    $user_id = (int) get_user_by( "login", "'"$ADMIN_USER"'" )->ID;
+    if ( ! $user_id ) {
+      $user_id = 1;
+    }
+
+    $consumer_key    = "ck_" . wc_rand_hash();
+    $consumer_secret = "cs_" . wc_rand_hash();
+
+    $wpdb->insert(
+      $table,
+      array(
+        "user_id"         => $user_id,
+        "description"     => $desc,
+        "permissions"     => "read",
+        "consumer_key"    => wc_api_hash( substr( $consumer_key, 3 ) ),
+        "consumer_secret" => $consumer_secret,
+        "truncated_key"   => substr( $consumer_key, -7 ),
+      ),
+      array( "%d", "%s", "%s", "%s", "%s", "%s" )
+    );
+
+    update_option( "sos_headless_wc_consumer_key", $consumer_key );
+    update_option( "sos_headless_wc_consumer_secret", $consumer_secret );
+
+    echo "Created WooCommerce REST API key.\n";
+    echo "WC_CONSUMER_KEY=" . $consumer_key . "\n";
+    echo "WC_CONSUMER_SECRET=" . $consumer_secret . "\n";
+    echo "Add these to your .env file for the Next.js frontend.\n";
+  ' 2>/dev/null || log "Could not create WC REST API keys — create manually in WooCommerce > Settings > Advanced > REST API."
 }
 
 main() {

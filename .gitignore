@@ -6,3 +6,4 @@
 wordpress/
 wp-content/
 !wp-content/themes/sos-beauty/
+!wp-content/plugins/sos-headless/

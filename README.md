@@ -1,10 +1,13 @@
-# JP Bùi Đặng — WordPress + WooCommerce (Docker)
+# JP Bùi Đặng — Headless WordPress + WooCommerce + Next.js
 
 Môi trường dev local cho cửa hàng ecommerce thị trường Việt Nam: VND, tiếng Việt, COD, chuyển khoản, MoMo, giao hàng nội địa.
+
+**Kiến trúc headless:** Next.js storefront → WooCommerce REST / Store API → WordPress + WooCommerce backend. Checkout hybrid redirect sang WP cho payment gateway.
 
 ## Yêu cầu
 
 - Docker Desktop (hoặc Docker Engine + Compose v2)
+- Node.js 20+ và pnpm (chỉ khi chạy frontend ngoài Docker)
 - 4GB RAM trở lên
 
 ## Chạy lần đầu
@@ -17,11 +20,33 @@ docker compose up -d
 docker compose --profile cli run --rm --entrypoint bash wpcli /scripts/setup.sh
 ```
 
+Setup script sẽ in `WC_CONSUMER_KEY` và `WC_CONSUMER_SECRET` — copy vào `.env`:
+
+```env
+WC_CONSUMER_KEY=ck_...
+WC_CONSUMER_SECRET=cs_...
+```
+
+Khởi động Next.js (Docker):
+
+```bash
+docker compose up -d nextjs
+```
+
+Hoặc dev local:
+
+```bash
+cp frontend/.env.local.example frontend/.env.local
+# Điền WC_CONSUMER_KEY / WC_CONSUMER_SECRET
+cd frontend && pnpm install && pnpm dev
+```
+
 Truy cập:
 
 | Dịch vụ | URL |
 |---------|-----|
-| Cửa hàng | http://localhost:8080 |
+| **Storefront (Next.js)** | http://localhost:3000 |
+| WordPress (checkout/admin) | http://localhost:8080 |
 | wp-admin | http://localhost:8080/wp-admin |
 | phpMyAdmin | http://localhost:8081 |
 
@@ -33,10 +58,23 @@ Truy cập:
 ## Kiến trúc
 
 ```
-wordpress:8080  →  MySQL (volume db_data)
-phpmyadmin:8081 →  MySQL
-wpcli (profile) →  one-shot setup / maintenance
+Next.js :3000          →  WooCommerce REST API (wc/v3) — products, categories
+                       →  WooCommerce Store API — cart
+                       →  SOS Headless API — hero, menu, checkout handoff
+
+WordPress :8080        →  MySQL (volume db_data)
+                       →  wp-admin CMS, checkout, payment (COD/MoMo/VNPay)
+
+phpmyadmin :8081       →  MySQL
+wpcli (profile)        →  one-shot setup / maintenance
 ```
+
+**Luồng checkout hybrid:**
+
+1. Khách browse + thêm giỏ trên Next.js (Store API + `Cart-Token`)
+2. Bấm **Thanh toán** → `POST /wp-json/sos/v1/checkout-handoff`
+3. Redirect sang `http://localhost:8080/checkout/` (WP session cart)
+4. Chọn COD / MoMo / VNPay trên WooCommerce checkout
 
 Dữ liệu WordPress lưu trong Docker volume `wordpress_data` — không commit vào git.
 
@@ -46,9 +84,10 @@ Dữ liệu WordPress lưu trong Docker volume `wordpress_data` — không commi
 - WooCommerce: quốc gia VN, tiền tệ **VND** (0 số thập phân)
 - Thanh toán: **COD**, **chuyển khoản ngân hàng (BACS)**
 - Vận chuyển: zone **Vietnam** (flat rate + free shipping)
-- Theme: **Storefront** + child **JP Bùi Đặng** (Washi & Matcha, Lora + Be Vietnam Pro)
-- Plugin: WooCommerce, Yoast SEO, Contact Form 7, MoMo
-- 5 sản phẩm demo, menu, trang chính sách
+- Plugin **SOS Headless**: CORS, REST meta, hero/menu API, cart handoff
+- Theme **Storefront** + child **JP Bùi Đặng** (checkout/account skin)
+- Frontend **Next.js** port UI từ `front-page.php`
+- 9 sản phẩm demo, menu, trang chính sách
 
 ## Thanh toán VNPay (sandbox)
 
@@ -63,38 +102,17 @@ Plugin VNPay không có trên WordPress.org (bản cũ đã đóng). Tải plugi
 docker compose --profile cli run --rm --entrypoint bash wpcli /scripts/setup.sh
 ```
 
-5. Cấu hình trong **WooCommerce → Cài đặt → Thanh toán → VNPAY**:
-
-| Trường | Giá trị sandbox (ví dụ) |
-|--------|-------------------------|
-| Terminal ID | `VNPAY_TMN_CODE` trong `.env` |
-| Secret Key | `VNPAY_HASH_SECRET` trong `.env` |
-| Url Pay | `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html` |
-| Locale | `vn` |
+5. Cấu hình trong **WooCommerce → Cài đặt → Thanh toán → VNPAY**
 
 ## Thanh toán MoMo (sandbox)
 
-Plugin `payment-gateway-mo-mo-for-woocommerce` đã được cài tự động.
+Plugin `payment-gateway-mo-mo-for-woocommerce` đã được cài tự động. Cấu hình trong **WooCommerce → Cài đặt → Thanh toán → MoMo Gateway**.
 
-1. Đăng ký tài khoản doanh nghiệp: https://momo.vn/
-2. Lấy Partner Code, Access Key, Secret Key từ MoMo sandbox
-3. Điền vào `.env`:
+## Verify checkout COD (end-to-end headless)
 
-```env
-MOMO_PARTNER_CODE=...
-MOMO_ACCESS_KEY=...
-MOMO_SECRET_KEY=...
-```
-
-4. Cấu hình trong **WooCommerce → Cài đặt → Thanh toán → MoMo Gateway**
-
-Endpoint sandbox mặc định: `https://test-payment.momo.vn/v2/gateway/api/create`
-
-## Verify checkout COD (end-to-end)
-
-1. Mở http://localhost:8080/shop/
-2. Thêm sản phẩm vào giỏ → **Thanh toán**
-3. Điền thông tin giao hàng (tỉnh/thành VN)
+1. Mở http://localhost:3000/shop/
+2. Thêm sản phẩm vào giỏ → **Giỏ hàng** → **Thanh toán**
+3. Redirect sang WP checkout → điền thông tin giao hàng (tỉnh/thành VN)
 4. Chọn **Thanh toán khi nhận hàng (COD)** → **Đặt hàng**
 5. Kiểm tra đơn trong **wp-admin → WooCommerce → Đơn hàng**
 
@@ -103,6 +121,10 @@ Endpoint sandbox mặc định: `https://test-payment.momo.vn/v2/gateway/api/cre
 ```bash
 # Xem logs
 docker compose logs -f wordpress
+docker compose logs -f nextjs
+
+# Rebuild frontend
+docker compose build nextjs && docker compose up -d nextjs
 
 # Backup database
 docker compose exec db mysqldump -u wp -p wordpress > backup.sql
@@ -117,25 +139,43 @@ docker compose down
 docker compose down -v
 ```
 
-## Tùy chỉnh theme mỹ phẩm
+## Frontend Next.js
 
-Child theme nằm tại `wp-content/themes/sos-beauty/` (mount vào container).
+| Route | Mô tả |
+|-------|-------|
+| `/` | Home — hero, categories, featured products |
+| `/shop` | Tất cả sản phẩm |
+| `/category/[slug]` | Danh mục (thuc-pham-nhat, my-pham-nhat, tpcn) |
+| `/product/[slug]` | Chi tiết + tabs Thành phần / Cách dùng / Lưu ý TPCN |
+| `/cart` | Giỏ hàng (Store API) |
+| `/checkout` | Handoff → WP checkout |
+| `/account` | Redirect → WP my-account |
 
-| File | Vai trò |
-|------|---------|
-| `style.css` | Palette Washi & Matcha, font Lora + Be Vietnam Pro |
-| `front-page.php` | Hero, 3 danh mục (thực phẩm / mỹ phẩm / TPCN) |
-| `functions.php` | Tab Thành phần / Cách dùng / Lưu ý TPCN |
-| `woocommerce/single-product/title.php` | Hiển thị thương hiệu |
+API clients: `frontend/lib/woocommerce.ts`, `store-api.ts`, `sos-api.ts`
 
-**Palette:** `--jp-matcha` (food), `--jp-sakura` (beauty), `--jp-indigo` (TPCN), `--jp-vermillion` (CTA)
+## WordPress backend
+
+| Thành phần | Vai trò |
+|------------|---------|
+| `wp-content/plugins/sos-headless/` | CORS, REST endpoints, cart handoff |
+| `wp-content/themes/sos-beauty/` | Checkout/account skin, hero customizer |
+
+**REST endpoints:**
+
+- `GET /wp-json/sos/v1/hero` — hero text từ Customizer
+- `GET /wp-json/sos/v1/menus/primary` — navigation
+- `POST /wp-json/sos/v1/checkout-handoff` — sync cart → WP session
 
 Đổi text hero: **Giao diện → Tùy chỉnh → JP Bùi Đặng Hero**
 
-Kích hoạt lại theme:
+## Production routing (nginx)
 
-```bash
-docker compose --profile cli run --rm --entrypoint wp wpcli --allow-root theme activate sos-beauty
+```
+example.com/*           → Next.js
+example.com/checkout    → WordPress
+example.com/my-account  → WordPress
+example.com/wp-admin    → WordPress
+example.com/wp-json/*   → WordPress
 ```
 
 ## Cấu trúc repo
@@ -143,20 +183,23 @@ docker compose --profile cli run --rm --entrypoint wp wpcli --allow-root theme a
 ```
 ├── docker-compose.yml
 ├── .env.example
-├── wp-content/themes/sos-beauty/   # Child theme mỹ phẩm (commit được)
-│   ├── style.css
-│   ├── functions.php
-│   ├── front-page.php
-│   └── woocommerce/
+├── frontend/                       # Next.js storefront
+│   ├── app/
+│   ├── components/
+│   ├── lib/
+│   └── Dockerfile
+├── wp-content/
+│   ├── themes/sos-beauty/
+│   └── plugins/sos-headless/
 ├── scripts/
-│   ├── setup.sh              # Khởi tạo WP + WooCommerce
+│   ├── setup.sh
 │   └── plugins/
-│       └── vnpay-woocommerce.zip   # (tự thêm) plugin VNPay
 └── README.md
 ```
 
 ## Mở rộng sau này
 
 - Tích hợp GHTK / GHN / Viettel Post (API vận chuyển)
+- Webhook revalidation cho Next.js ISR
+- Customer login trong Next.js (hiện redirect WP)
 - Deploy production (nginx, SSL, backup tự động)
-- Theme trả phí (Kadence, Flatsome) hoặc custom theme
