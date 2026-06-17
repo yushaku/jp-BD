@@ -95,6 +95,27 @@ export interface CategoryCard {
   variant: "food" | "beauty" | "supplement";
 }
 
+export interface WpRendered {
+  rendered: string;
+}
+
+export interface WpFeaturedMedia {
+  source_url: string;
+  alt_text: string;
+}
+
+export interface WpPost {
+  id: number;
+  slug: string;
+  date: string;
+  title: WpRendered;
+  excerpt: WpRendered;
+  content: WpRendered;
+  _embedded?: {
+    "wp:featuredmedia"?: WpFeaturedMedia[];
+  };
+}
+
 export const CATEGORY_CARDS: CategoryCard[] = [
   {
     slug: "thuc-pham-nhat",
