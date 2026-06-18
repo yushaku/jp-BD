@@ -1,4 +1,4 @@
-import { ProductGrid } from "@/components/ProductCard";
+import { ProductGrid } from "@/components/ProductGrid";
 import type { WcCategory, WcProduct } from "@/lib/types";
 import { CategorySidebar, groupCategories } from "./CategorySidebar";
 

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ProductGrid } from "@/components/ProductCard";
+import { ProductGrid } from "@/components/ProductGrid";
 import type { WcProduct } from "@/lib/types";
 
 const accentColors = {

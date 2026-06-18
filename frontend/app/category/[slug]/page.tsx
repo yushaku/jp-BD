@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ProductGrid } from "@/components/ProductCard";
+import { ProductGrid } from "@/components/ProductGrid";
 import { Section } from "@/components/Section";
 import { getCategoryBySlug, getProductsByCategory } from "@/lib/woocommerce";
 

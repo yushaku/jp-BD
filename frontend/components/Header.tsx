@@ -50,12 +50,12 @@ export async function Header() {
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <CartNavLink />
-          <Link
+          {/* <Link
             href="/account"
             className="hidden text-xs font-semibold uppercase tracking-wider text-jp-ink hover:text-jp-matcha sm:inline"
           >
             Tài khoản
-          </Link>
+          </Link> */}
         </div>
       </div>
     </header>

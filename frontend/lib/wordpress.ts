@@ -1,5 +1,5 @@
 import { wpApiUrl } from "./config";
-import type { WpFeaturedMedia, WpPost } from "./types";
+import type { WpFeaturedMedia, WpPage, WpPost } from "./types";
 
 const REVALIDATE = 60;
 export const POSTS_PER_PAGE = 12;
@@ -90,8 +90,59 @@ export async function getPostBySlug(slug: string): Promise<WpPost | null> {
   }
 }
 
-export function getPostFeaturedImage(
-  post: WpPost,
-): WpFeaturedMedia | null {
+export function getPostFeaturedImage(post: WpPost): WpFeaturedMedia | null {
   return post._embedded?.["wp:featuredmedia"]?.[0] ?? null;
+}
+
+export async function getPageBySlug(slug: string): Promise<WpPage | null> {
+  try {
+    const pages = await wpFetch<WpPage[]>("/pages", {
+      slug,
+      status: "publish",
+      _embed: "1",
+    });
+    return pages[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getPages(): Promise<WpPage[]> {
+  const all: WpPage[] = [];
+  let page = 1;
+
+  try {
+    while (true) {
+      const url = new URL("/wp-json/wp/v2/pages", wpApiUrl);
+      url.searchParams.set("per_page", "100");
+      url.searchParams.set("page", String(page));
+      url.searchParams.set("status", "publish");
+      url.searchParams.set("_embed", "1");
+
+      const res = await fetch(url.toString(), {
+        next: { revalidate: REVALIDATE },
+      });
+
+      if (!res.ok) {
+        break;
+      }
+
+      const batch = (await res.json()) as WpPage[];
+      all.push(...batch);
+
+      if (batch.length < 100) {
+        break;
+      }
+
+      page += 1;
+    }
+  } catch {
+    return [];
+  }
+
+  return all;
+}
+
+export function getPageFeaturedImage(page: WpPage): WpFeaturedMedia | null {
+  return page._embedded?.["wp:featuredmedia"]?.[0] ?? null;
 }

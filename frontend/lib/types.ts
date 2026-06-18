@@ -124,6 +124,17 @@ export interface WpPost {
   };
 }
 
+export interface WpPage {
+  id: number;
+  slug: string;
+  title: WpRendered;
+  excerpt: WpRendered;
+  content: WpRendered;
+  _embedded?: {
+    "wp:featuredmedia"?: WpFeaturedMedia[];
+  };
+}
+
 export const CATEGORY_CARDS: CategoryCard[] = [
   {
     slug: "thuc-pham-nhat",
