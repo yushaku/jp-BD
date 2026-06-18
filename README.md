@@ -44,14 +44,48 @@ cp frontend/.env.local.example frontend/.env.local
 cd frontend && pnpm install && pnpm dev
 ```
 
-Truy cập:
+Truy cập (mode `ports` — mặc định khi chưa dùng nginx):
 
-| Dịch vụ | URL |
-|---------|-----|
-| **Storefront (Next.js)** | http://localhost:3000 |
-| WordPress (checkout/admin) | http://localhost:8080 |
-| wp-admin | http://localhost:8080/wp-admin |
-| phpMyAdmin | http://localhost:8081 |
+| Dịch vụ                    | URL                            |
+| -------------------------- | ------------------------------ |
+| **Storefront (Next.js)**   | http://localhost:3000          |
+| WordPress (checkout/admin) | http://localhost:8080          |
+| wp-admin                   | http://localhost:8080/wp-admin |
+| phpMyAdmin                 | http://localhost:8081          |
+
+## Chuyển mode: localhost ↔ Cloudflare tunnel
+
+Script `scripts/mode.sh` cập nhật `.env`, WordPress `home`/`siteurl`, và khởi động đúng stack:
+
+```bash
+chmod +x scripts/mode.sh
+
+# Local — một domain qua nginx :80
+./scripts/mode.sh local
+# → http://localhost          (storefront)
+# → http://localhost/wp-admin (admin)
+
+# Local — truy cập trực tiếp từng port (không nginx)
+./scripts/mode.sh ports
+# → http://localhost:3000       (Next.js)
+# → http://localhost:8080/wp-admin
+
+# Tunnel — public qua Cloudflare
+./scripts/mode.sh tunnel
+cloudflared tunnel run yuchi-local
+# → https://shop.yuchi-education.com
+# → https://shop.yuchi-education.com/wp-admin
+
+./scripts/mode.sh status   # xem mode hiện tại
+```
+
+| Mode    | Storefront              | wp-admin                         | nginx |
+| ------- | ----------------------- | -------------------------------- | ----- |
+| `local` | http://localhost        | http://localhost/wp-admin        | ✓     |
+| `ports` | http://localhost:3000   | http://localhost:8080/wp-admin   | ✗     |
+| `tunnel`| https://shop.yuchi-education.com | same domain + `/wp-admin` | ✓ + cloudflared |
+
+Đổi tunnel hostname trong `.env`: `TUNNEL_HOSTNAME=your.domain.com`
 
 **Đăng nhập admin mặc định** (đổi ngay sau lần đăng nhập đầu):
 
@@ -144,24 +178,24 @@ docker compose down -v
 
 ## Frontend Next.js
 
-| Route | Mô tả |
-|-------|-------|
-| `/` | Home — hero, categories, featured products |
-| `/shop` | Tất cả sản phẩm |
-| `/category/[slug]` | Danh mục (thuc-pham-nhat, my-pham-nhat, tpcn) |
-| `/product/[slug]` | Chi tiết + tabs Thành phần / Cách dùng / Lưu ý TPCN |
-| `/cart` | Giỏ hàng (Store API) |
-| `/checkout` | Handoff → WP checkout |
-| `/account` | Redirect → WP my-account |
+| Route              | Mô tả                                               |
+| ------------------ | --------------------------------------------------- |
+| `/`                | Home — hero, categories, featured products          |
+| `/shop`            | Tất cả sản phẩm                                     |
+| `/category/[slug]` | Danh mục (thuc-pham-nhat, my-pham-nhat, tpcn)       |
+| `/product/[slug]`  | Chi tiết + tabs Thành phần / Cách dùng / Lưu ý TPCN |
+| `/cart`            | Giỏ hàng (Store API)                                |
+| `/checkout`        | Handoff → WP checkout                               |
+| `/account`         | Redirect → WP my-account                            |
 
 API clients: `frontend/lib/woocommerce.ts`, `store-api.ts`, `sos-api.ts`
 
 ## WordPress backend
 
-| Thành phần | Vai trò |
-|------------|---------|
-| `wp-content/plugins/sos-headless/` | CORS, REST endpoints, cart handoff |
-| `wp-content/themes/sos-beauty/` | Checkout/account skin, hero customizer |
+| Thành phần                         | Vai trò                                |
+| ---------------------------------- | -------------------------------------- |
+| `wp-content/plugins/sos-headless/` | CORS, REST endpoints, cart handoff     |
+| `wp-content/themes/sos-beauty/`    | Checkout/account skin, hero customizer |
 
 **REST endpoints:**
 
@@ -173,13 +207,17 @@ API clients: `frontend/lib/woocommerce.ts`, `store-api.ts`, `sos-api.ts`
 
 ## Production routing (nginx)
 
-```
-example.com/*           → Next.js
-example.com/checkout    → WordPress
-example.com/my-account  → WordPress
-example.com/wp-admin    → WordPress
-example.com/wp-json/*   → WordPress
-```
+Cấu hình sẵn trong `nginx/conf.d/sos.conf`. Dùng `./scripts/mode.sh local` hoặc `tunnel` — script tự bật nginx.
+
+| Path                          | Backend                      |
+| ----------------------------- | ---------------------------- |
+| `/*` (mặc định)               | Next.js storefront           |
+| `/checkout`, `/my-account`    | WordPress (WooCommerce)      |
+| `/wp-admin`, `/wp-login.php`  | WordPress admin              |
+| `/wp-json/*`, `/wp-content/*` | WordPress REST & assets      |
+| `/?wc-ajax=*`                 | WooCommerce AJAX → WordPress |
+
+**Bare metal** (Next :3000, WP :8080): copy `nginx/conf.d/sos.local.conf.example` → `sos.local.conf`.
 
 ## Cấu trúc repo
 
@@ -206,3 +244,19 @@ example.com/wp-json/*   → WordPress
 - Webhook revalidation cho Next.js ISR
 - Customer login trong Next.js (hiện redirect WP)
 - Deploy production (nginx, SSL, backup tự động)
+
+## Publish qua Cloudflare tunnel
+
+Config tunnel: `~/.cloudflared/config.yml`
+
+```yaml
+ingress:
+  - hostname: shop.yuchi-education.com
+    service: http://localhost:80
+  - service: http_status:404
+```
+
+```bash
+./scripts/mode.sh tunnel
+cloudflared tunnel run yuchi-local
+```
