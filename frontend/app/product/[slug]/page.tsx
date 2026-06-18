@@ -1,12 +1,19 @@
 import { notFound } from "next/navigation";
-import { AddToCartButton } from "@/components/AddToCartButton";
 import { ProductTabs } from "@/components/ProductTabs";
-import { formatPrice, stripHtml } from "@/lib/format";
+import { getSalePercent, stripHtml } from "@/lib/format";
+import { getProductReviews } from "@/lib/product-reviews";
 import {
   getProductBySlug,
-  getVolume,
+  getProductsByCategory,
   isTpcnProduct,
 } from "@/lib/woocommerce";
+import {
+  ProductBreadcrumb,
+  ProductGallery,
+  ProductReviews,
+  ProductSummary,
+  RelatedProducts,
+} from "./components";
 
 export const revalidate = 60;
 
@@ -37,9 +44,20 @@ export default async function ProductPage({
     notFound();
   }
 
-  const image = product.images[0];
-  const volume = getVolume(product);
+  const reviews = await getProductReviews(product.id);
+
   const showSupplement = isTpcnProduct(product);
+  const salePrice = product.sale_price || product.price;
+  const salePercent = product.on_sale
+    ? getSalePercent(product.regular_price, salePrice)
+    : null;
+
+  const relatedCategoryId = product.categories[0]?.id;
+  const relatedProducts = relatedCategoryId
+    ? (await getProductsByCategory(relatedCategoryId, 5)).filter(
+        (item) => item.id !== product.id,
+      ).slice(0, 4)
+    : [];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -47,6 +65,13 @@ export default async function ProductPage({
     name: product.name,
     image: product.images.map((img) => img.src),
     description: stripHtml(product.short_description || product.description),
+    ...(reviews.count > 0 && {
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: reviews.average,
+        reviewCount: reviews.count,
+      },
+    }),
     offers: {
       "@type": "Offer",
       price: product.price,
@@ -59,69 +84,41 @@ export default async function ProductPage({
   };
 
   return (
-    <article className="mx-auto max-w-6xl px-6 py-10">
+    <article className="mx-auto max-w-6xl px-6 py-6 sm:py-10">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="grid gap-10 lg:grid-cols-2">
-        <div className="relative aspect-square overflow-hidden rounded-[var(--jp-radius)] border border-jp-border bg-white">
-          {image ? (
-            <img
-              src={image.src}
-              alt={image.alt || product.name}
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
-              className="absolute inset-0 size-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center text-jp-muted">
-              Không có ảnh
-            </div>
-          )}
-        </div>
 
-        <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-jp-gold">
-            Chính hãng Nhật Bản
-          </p>
-          <h1 className="text-[1.85rem]">{product.name}</h1>
-          {volume && (
-            <p className="mt-1 text-sm text-jp-muted">{volume}</p>
-          )}
-          <p className="mt-4 text-2xl font-semibold text-jp-indigo">
-            {formatPrice(product.price)}
-          </p>
-          {product.short_description && (
-            <div
-              className="mt-4 border-l-[3px] border-jp-matcha pl-4 text-jp-muted"
-              dangerouslySetInnerHTML={{
-                __html: product.short_description,
-              }}
-            />
-          )}
-          <div className="mt-6 max-w-xs">
-            <AddToCartButton
-              productId={product.id}
-              stockStatus={product.stock_status}
-            />
-          </div>
-          <div className="mt-6 border-t border-jp-border pt-4 text-sm text-jp-muted">
-            Danh mục:{" "}
-            {product.categories.map((c) => c.name).join(", ") || "—"}
-          </div>
-        </div>
+      <ProductBreadcrumb product={product} />
+
+      <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
+        <ProductGallery
+          images={product.images}
+          name={product.name}
+          onSale={product.on_sale}
+          salePercent={salePercent}
+        />
+        <ProductSummary product={product} reviews={reviews} />
       </div>
 
       <ProductTabs meta={product.sos_meta} showSupplement={showSupplement} />
 
       {product.description && (
-        <div
-          className="prose prose-sm mt-8 max-w-none text-jp-muted"
-          dangerouslySetInnerHTML={{ __html: product.description }}
-        />
+        <section className="mt-10 border-t border-jp-border pt-8">
+          <h2 className="mb-4 text-xl font-semibold text-jp-ink">
+            Mô tả chi tiết
+          </h2>
+          <div
+            className="prose prose-sm max-w-none text-jp-muted prose-headings:text-jp-ink prose-a:text-jp-indigo"
+            dangerouslySetInnerHTML={{ __html: product.description }}
+          />
+        </section>
       )}
+
+      <ProductReviews productId={product.id} initialData={reviews} />
+
+      <RelatedProducts products={relatedProducts} />
     </article>
   );
 }

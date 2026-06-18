@@ -135,6 +135,22 @@ export interface WpPage {
   };
 }
 
+export interface ProductReview {
+  id: number;
+  author: string;
+  date: string;
+  content: string;
+  rating: number;
+  verified?: boolean;
+}
+
+export interface ProductReviewsData {
+  average: number;
+  count: number;
+  breakdown: Record<"1" | "2" | "3" | "4" | "5", number>;
+  reviews: ProductReview[];
+}
+
 export const CATEGORY_CARDS: CategoryCard[] = [
   {
     slug: "thuc-pham-nhat",

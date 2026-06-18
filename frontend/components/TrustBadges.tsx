@@ -133,7 +133,7 @@ export function TrustBadges() {
         ))}
       </div>
 
-      <header className="mb-8 border-b-2 border-jp-matcha pb-3 text-center">
+      <header className="mb-8 border-b-2 border-jp-gold pb-3 text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-jp-gold">
           Tại sao chọn chúng tôi
         </p>
@@ -150,9 +150,9 @@ export function TrustBadges() {
               className="flex flex-col items-center rounded-(--jp-radius) px-3 py-5 text-center shadow-(--jp-shadow) sm:px-4 sm:py-6"
             >
               <span className="mb-3 flex size-10 items-center justify-center rounded-full bg-jp-paper ring-1 ring-jp-border sm:mb-4 sm:size-11">
-                <Icon className="size-5 text-jp-matcha" aria-hidden />
+                <Icon className="size-6 text-jp-gold" aria-hidden />
               </span>
-              <h3 className="text-sm font-semibold leading-snug text-jp-ink sm:text-[1.05rem]">
+              <h3 className="text-lg font-bold leading-snug text-jp-ink sm:text-[1.05rem]">
                 {item.title}
               </h3>
               <p className="mt-1.5 text-xs leading-relaxed text-jp-muted sm:text-sm">

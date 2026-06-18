@@ -37,6 +37,7 @@ export default async function HomePage() {
   return (
     <>
       <AnnouncementBar />
+
       <Hero data={hero} />
 
       <Section title="Bán chạy" description="Được khách hàng tin chọn nhất">
@@ -68,6 +69,7 @@ export default async function HomePage() {
       />
 
       <TrustBadges />
+
       <NewsPreview posts={newsPosts} />
     </>
   );

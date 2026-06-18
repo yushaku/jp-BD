@@ -1,6 +1,6 @@
 import { wpApiUrl } from "./config";
 import { DEFAULT_BANNER_SLIDES } from "./home-banners";
-import type { BannerSlide, HeroData, MenuItem } from "./types";
+import type { BannerSlide, HeroData, MenuItem, ProductReviewsData } from "./types";
 
 const HERO_REVALIDATE = 300;
 
@@ -47,5 +47,25 @@ export async function getMenu(
     return data.items;
   } catch {
     return [];
+  }
+}
+
+const EMPTY_REVIEWS = {
+  average: 0,
+  count: 0,
+  breakdown: { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
+  reviews: [],
+} as const;
+
+export async function getProductReviews(
+  productId: number,
+): Promise<ProductReviewsData> {
+  try {
+    return await sosFetch<ProductReviewsData>(
+      `/products/${productId}/reviews`,
+      60,
+    );
+  } catch {
+    return { ...EMPTY_REVIEWS, reviews: [] };
   }
 }
