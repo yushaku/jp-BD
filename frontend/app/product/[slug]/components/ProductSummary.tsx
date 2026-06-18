@@ -133,14 +133,12 @@ export function ProductSummary({
         </dl>
       )}
 
-      <div className="mt-6 rounded-(--jp-radius) border border-jp-border bg-jp-paper/60 p-4">
-        <AddToCartButton
-          productId={product.id}
-          stockStatus={product.stock_status}
-          className="h-11 w-full cursor-pointer rounded-lg border-0 bg-jp-indigo text-sm font-semibold text-white uppercase tracking-wider hover:bg-jp-indigo/90 hover:text-white"
-          label="Thêm vào giỏ"
-        />
-      </div>
+      <AddToCartButton
+        productId={product.id}
+        stockStatus={product.stock_status}
+        className="h-11 mt-6 w-full cursor-pointer rounded-lg border-0 bg-jp-indigo text-sm font-semibold text-white uppercase tracking-wider hover:bg-jp-indigo/90 hover:text-white"
+        label="Thêm vào giỏ"
+      />
 
       <ul className="mt-5 space-y-2.5 text-sm text-jp-muted">
         {TRUST_ITEMS.map((item) => (
