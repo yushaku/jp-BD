@@ -77,7 +77,7 @@ export function ProductCard({
         {salePercent && (
           <Badge
             variant="default"
-            className="absolute top-3 right-3 z-10 px-3 py-2 text-lg"
+            className="absolute bg-jp-matcha top-3 right-3 z-10 px-3 py-2 text-lg"
           >
             -{salePercent}%
           </Badge>

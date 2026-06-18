@@ -18,7 +18,7 @@ export type NavItem = {
 };
 
 const linkClassName =
-  "block rounded-(--jp-radius) px-3 py-3 text-sm font-semibold uppercase tracking-wider text-jp-ink hover:bg-jp-paper hover:text-jp-matcha";
+  "block rounded-(--jp-radius) px-3 py-3 text-sm font-semibold uppercase tracking-wider text-jp-ink hover:bg-jp-paper hover:text-jp-gold";
 
 export function MobileNav({ items }: { items: NavItem[] }) {
   const [mounted, setMounted] = useState(false);

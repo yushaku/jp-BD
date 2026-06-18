@@ -44,20 +44,25 @@ export default async function ProductPage({
     notFound();
   }
 
-  const reviews = await getProductReviews(product.id);
+  const relatedCategoryId = product.categories[0]?.id;
+  const relatedCategorySlug = product.categories[0]?.slug;
+
+  const [reviews, categoryProducts] = await Promise.all([
+    getProductReviews(product.id),
+    relatedCategoryId
+      ? getProductsByCategory(relatedCategoryId, 5)
+      : Promise.resolve([]),
+  ]);
+
+  const relatedProducts = categoryProducts
+    .filter((item) => item.id !== product.id)
+    .slice(0, 4);
 
   const showSupplement = isTpcnProduct(product);
   const salePrice = product.sale_price || product.price;
   const salePercent = product.on_sale
     ? getSalePercent(product.regular_price, salePrice)
     : null;
-
-  const relatedCategoryId = product.categories[0]?.id;
-  const relatedProducts = relatedCategoryId
-    ? (await getProductsByCategory(relatedCategoryId, 5)).filter(
-        (item) => item.id !== product.id,
-      ).slice(0, 4)
-    : [];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -99,18 +104,35 @@ export default async function ProductPage({
           onSale={product.on_sale}
           salePercent={salePercent}
         />
-        <ProductSummary product={product} reviews={reviews} />
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <ProductSummary product={product} reviews={reviews} />
+        </div>
       </div>
 
-      <ProductTabs meta={product.sos_meta} showSupplement={showSupplement} />
+      <section className="mt-10 bg-jp-cream p-4 rounded-2xl shadow-(--jp-shadow)">
+        <header className="mb-4">
+          <p className="text-xs font-semibold tracking-[0.12em] text-jp-gold uppercase">
+            Thông tin sử dụng
+          </p>
+          <h2 className="mt-1 text-lg font-semibold text-jp-ink">
+            Thành phần & hướng dẫn
+          </h2>
+        </header>
+        <ProductTabs meta={product.sos_meta} showSupplement={showSupplement} />
+      </section>
 
       {product.description && (
-        <section className="mt-10 border-t border-jp-border pt-8">
-          <h2 className="mb-4 text-xl font-semibold text-jp-ink">
-            Mô tả chi tiết
-          </h2>
+        <section className="mt-12 border-t border-jp-border pt-10 bg-jp-cream rounded-2xl p-4 shadow-(--jp-shadow)">
+          <header className="mb-6">
+            <p className="text-xs font-semibold tracking-[0.12em] text-jp-gold uppercase">
+              Chi tiết sản phẩm
+            </p>
+            <h2 className="mt-1 text-[1.65rem] font-semibold text-jp-ink">
+              Mô tả chi tiết
+            </h2>
+          </header>
           <div
-            className="prose prose-sm max-w-none text-jp-muted prose-headings:text-jp-ink prose-a:text-jp-indigo"
+            className="prose prose-base max-w-none leading-relaxed text-jp-muted prose-headings:font-semibold prose-headings:text-jp-ink prose-p:leading-relaxed prose-a:font-medium prose-a:text-jp-indigo prose-a:no-underline prose-a:transition-colors prose-a:hover:text-jp-matcha prose-strong:text-jp-ink prose-img:rounded-(--jp-radius) prose-img:border prose-img:border-jp-border"
             dangerouslySetInnerHTML={{ __html: product.description }}
           />
         </section>
@@ -118,7 +140,10 @@ export default async function ProductPage({
 
       <ProductReviews productId={product.id} initialData={reviews} />
 
-      <RelatedProducts products={relatedProducts} />
+      <RelatedProducts
+        products={relatedProducts}
+        categorySlug={relatedCategorySlug}
+      />
     </article>
   );
 }

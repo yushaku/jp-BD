@@ -21,7 +21,7 @@ export function ProductGallery({
 
   if (!active) {
     return (
-      <div className="flex aspect-square items-center justify-center rounded-(--jp-radius) border border-jp-border bg-white text-jp-muted">
+      <div className="flex aspect-square items-center justify-center rounded-(--jp-radius) border border-jp-border bg-jp-cream text-jp-muted shadow-(--jp-shadow)">
         Không có ảnh
       </div>
     );
@@ -29,7 +29,7 @@ export function ProductGallery({
 
   return (
     <div className="space-y-3">
-      <div className="relative aspect-square overflow-hidden rounded-(--jp-radius) border border-jp-border bg-white">
+      <div className="relative aspect-square overflow-hidden rounded-(--jp-radius) border border-jp-border bg-white shadow-(--jp-shadow)">
         <img
           src={active.src}
           alt={active.alt || name}
@@ -39,7 +39,7 @@ export function ProductGallery({
           className="absolute inset-0 size-full object-contain p-4 sm:p-6"
         />
         {onSale && salePercent && (
-          <Badge className="absolute top-3 right-3 z-10 border-0 bg-jp-vermillion px-2.5 py-1 text-xs font-bold uppercase">
+          <Badge className="absolute top-3 right-3 z-10 border-0 bg-jp-vermillion px-2.5 py-1 text-xs font-bold uppercase shadow-md">
             -{salePercent}%
           </Badge>
         )}
@@ -55,10 +55,10 @@ export function ProductGallery({
                 aria-pressed={index === activeIndex}
                 onClick={() => setActiveIndex(index)}
                 className={cn(
-                  "relative aspect-square overflow-hidden rounded-(--jp-radius) border bg-white p-1 transition",
+                  "relative aspect-square cursor-pointer overflow-hidden rounded-(--jp-radius) border bg-white p-1 transition-colors duration-200",
                   index === activeIndex
                     ? "border-jp-indigo ring-2 ring-jp-indigo/20"
-                    : "border-jp-border hover:border-jp-matcha",
+                    : "border-jp-border hover:border-jp-gold",
                 )}
               >
                 <img

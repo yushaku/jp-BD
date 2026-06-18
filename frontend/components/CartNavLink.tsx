@@ -11,7 +11,7 @@ export function CartNavLink() {
   return (
     <Link
       href="/cart"
-      className="relative flex items-center gap-1 text-xs font-bold uppercase text-jp-ink hover:text-jp-matcha"
+      className="relative flex items-center gap-1 text-xs font-bold uppercase text-jp-ink hover:text-jp-gold"
     >
       <ShoppingCart className="size-4" />
       <span className="text-jp-ink">Giỏ hàng</span>

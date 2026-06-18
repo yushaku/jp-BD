@@ -97,7 +97,6 @@ export interface StoreCart {
 
 export interface CategoryCard {
   slug: string;
-  kanji: string;
   label: string;
   desc: string;
   variant: "food" | "beauty" | "supplement";
@@ -154,21 +153,18 @@ export interface ProductReviewsData {
 export const CATEGORY_CARDS: CategoryCard[] = [
   {
     slug: "thuc-pham-nhat",
-    kanji: "食",
     label: "Thực phẩm Nhật",
     desc: "Matcha, miso, snack",
     variant: "food",
   },
   {
     slug: "my-pham-nhat",
-    kanji: "美",
     label: "Mỹ phẩm",
     desc: "Skincare, makeup",
     variant: "beauty",
   },
   {
     slug: "tpcn",
-    kanji: "健",
     label: "TPCN",
     desc: "Vitamin, collagen",
     variant: "supplement",

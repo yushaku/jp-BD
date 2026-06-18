@@ -52,7 +52,7 @@ export function ProductSummary({
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <Link
           href="#reviews"
-          className="flex items-center gap-2 hover:opacity-80"
+          className="flex cursor-pointer items-center gap-2 transition-opacity duration-200 hover:opacity-80"
         >
           <StarRating
             value={reviews.count > 0 ? reviews.average : 0}
@@ -79,7 +79,7 @@ export function ProductSummary({
           </p>
         )}
         {salePercent && (
-          <Badge className="mb-1 border-0 bg-jp-matcha text-white">
+          <Badge className="mb-1 border-0 bg-jp-gold text-white">
             Tiết kiệm {salePercent}%
           </Badge>
         )}
@@ -90,7 +90,7 @@ export function ProductSummary({
           variant="outline"
           className={
             inStock
-              ? "border-jp-matcha text-jp-matcha"
+              ? "border-jp-gold text-jp-gold"
               : "border-jp-vermillion text-jp-vermillion"
           }
         >
@@ -133,11 +133,11 @@ export function ProductSummary({
         </dl>
       )}
 
-      <div className="mt-6">
+      <div className="mt-6 rounded-(--jp-radius) border border-jp-border bg-jp-paper/60 p-4">
         <AddToCartButton
           productId={product.id}
           stockStatus={product.stock_status}
-          className="h-11 w-full rounded-lg border-0 bg-jp-indigo px-2.5 text-[0.6rem] font-semibold text-white uppercase tracking-wide hover:bg-jp-indigo/90 hover:text-white sm:h-9 sm:px-3 sm:text-[0.65rem]"
+          className="h-11 w-full cursor-pointer rounded-lg border-0 bg-jp-indigo text-sm font-semibold text-white uppercase tracking-wider hover:bg-jp-indigo/90 hover:text-white"
           label="Thêm vào giỏ"
         />
       </div>
@@ -146,17 +146,14 @@ export function ProductSummary({
         {TRUST_ITEMS.map((item) => (
           <li key={item} className="flex items-start gap-2">
             <Check
-              className="mt-0.5 size-4 shrink-0 text-jp-matcha"
+              className="mt-0.5 size-4 shrink-0 text-jp-gold"
               aria-hidden
             />
             {item}
           </li>
         ))}
         <li className="flex items-start gap-2">
-          <Truck
-            className="mt-0.5 size-4 shrink-0 text-jp-matcha"
-            aria-hidden
-          />
+          <Truck className="mt-0.5 size-4 shrink-0 text-jp-gold" aria-hidden />
           Miễn phí vận chuyển đơn từ 500.000đ (nội thành)
         </li>
       </ul>
@@ -169,7 +166,7 @@ export function ProductSummary({
               {index > 0 && ", "}
               <Link
                 href={`/category/${category.slug}`}
-                className="text-jp-indigo hover:text-jp-matcha"
+                className="cursor-pointer text-jp-indigo transition-colors duration-200 hover:text-jp-gold"
               >
                 {category.name}
               </Link>

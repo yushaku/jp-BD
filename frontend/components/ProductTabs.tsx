@@ -35,13 +35,16 @@ export function ProductTabs({
   const defaultTab = visibleTabs[0]?.value ?? "ingredients";
 
   return (
-    <Tabs defaultValue={defaultTab} className="mt-8">
-      <TabsList variant="line" className="h-auto w-full justify-start rounded-none border-b border-jp-border bg-transparent p-0">
+    <Tabs defaultValue={defaultTab}>
+      <TabsList
+        variant="line"
+        className="h-auto w-full justify-start rounded-none border-b border-jp-border bg-transparent p-0"
+      >
         {visibleTabs.map((tab) => (
           <TabsTrigger
             key={tab.value}
             value={tab.value}
-            className="rounded-none px-4 py-2 text-xs font-semibold uppercase tracking-wide data-active:text-jp-indigo"
+            className="cursor-pointer rounded-none px-4 py-2 text-xs font-semibold uppercase tracking-wide transition-colors duration-200 data-active:text-jp-indigo"
           >
             {tab.label}
           </TabsTrigger>
@@ -51,7 +54,7 @@ export function ProductTabs({
         <TabsContent
           key={tab.value}
           value={tab.value}
-          className="py-4 text-[0.95rem] leading-relaxed text-muted-foreground"
+          className="py-4 text-[0.95rem] leading-relaxed text-jp-muted"
         >
           {meta?.[tab.key] || DEFAULTS[tab.key]}
         </TabsContent>

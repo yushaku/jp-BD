@@ -1,13 +1,14 @@
-import { Section } from "@/components/Section";
 import {
   getCategories,
   getCategoryBySlug,
   getProductsByCategory,
 } from "@/lib/woocommerce";
-import { ShopCatalog } from "./components";
+import { ShopCatalog, ShopHero } from "./components";
 
 export const metadata = {
   title: "Cửa hàng",
+  description:
+    "Thực phẩm, mỹ phẩm & TPCN chính hãng từ Nhật Bản. Nhập khẩu uy tín, giao hàng toàn quốc.",
 };
 
 export const revalidate = 60;
@@ -31,13 +32,20 @@ export default async function ShopPage({
     : [];
 
   return (
-    <Section title="Cửa hàng" description="Thực phẩm, mỹ phẩm & TPCN Nhật Bản">
-      <ShopCatalog
-        categories={categories}
-        products={products}
-        activeSlug={activeCategory?.slug}
+    <>
+      <ShopHero
         activeCategory={activeCategory}
+        productCount={products.length}
+        categoryCount={categories.length}
       />
-    </Section>
+      <div className="mx-auto mb-12 max-w-6xl px-6">
+        <ShopCatalog
+          categories={categories}
+          products={products}
+          activeSlug={activeCategory?.slug}
+          activeCategory={activeCategory}
+        />
+      </div>
+    </>
   );
 }

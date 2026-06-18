@@ -41,7 +41,7 @@ export async function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="px-2 py-1 text-[0.7rem] font-semibold uppercase tracking-wider text-jp-ink hover:text-jp-matcha"
+                className="px-2 py-1 text-[0.7rem] font-semibold uppercase tracking-wider text-jp-ink hover:text-jp-gold"
               >
                 {item.label}
               </Link>
@@ -52,7 +52,7 @@ export async function Header() {
           <CartNavLink />
           <Link
             href="/account"
-            className="hidden text-xs font-semibold uppercase tracking-wider text-jp-ink hover:text-jp-matcha sm:inline"
+            className="hidden text-xs font-semibold uppercase tracking-wider text-jp-ink hover:text-jp-gold sm:inline"
           >
             Tài khoản
           </Link>

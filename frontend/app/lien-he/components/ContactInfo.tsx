@@ -10,7 +10,7 @@ export function ContactInfoGrid() {
       <Card className="border-0 bg-jp-cream ring-0 shadow-none">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
-            <MapPin className="size-5 text-jp-matcha" />
+            <MapPin className="size-5 text-jp-gold" />
             {address.title}
           </CardTitle>
         </CardHeader>

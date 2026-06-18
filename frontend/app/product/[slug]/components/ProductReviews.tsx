@@ -100,7 +100,7 @@ export function ProductReviews({
   }
 
   return (
-    <section id="reviews" className="mt-12 pt-10">
+    <section id="reviews" className="mt-12 border-t border-jp-border pt-10">
       <header className="mb-8">
         <p className="text-xs font-semibold tracking-[0.12em] text-jp-gold uppercase">
           Khách hàng nói gì
@@ -111,7 +111,7 @@ export function ProductReviews({
       </header>
 
       <div className="flex flex-col gap-8">
-        <div className="rounded-(--jp-radius) bg-jp-cream p-5 sm:p-6">
+        <div className="rounded-(--jp-radius) border border-jp-border bg-jp-cream p-5 shadow-(--jp-shadow) sm:p-6">
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div>
               <p className="text-4xl font-bold text-jp-ink">
@@ -135,7 +135,7 @@ export function ProductReviews({
           </div>
         </div>
 
-        <div className="rounded-(--jp-radius) bg-jp-cream p-5 sm:p-6">
+        <div className="rounded-(--jp-radius) border border-jp-border bg-jp-cream p-5 shadow-(--jp-shadow) sm:p-6">
           <h3 className="text-lg font-semibold text-jp-ink">Viết đánh giá</h3>
           <p className="mt-1 text-sm text-jp-muted">
             Chỉ khách đã mua sản phẩm mới được đánh giá. Vui lòng dùng{" "}
@@ -212,9 +212,12 @@ export function ProductReviews({
         </div>
 
         {data.reviews.length > 0 ? (
-          <ul className="space-y-4 bg-jp-cream">
+          <ul className="space-y-4">
             {data.reviews.map((review) => (
-              <li key={review.id} className="rounded-(--jp-radius) p-5">
+              <li
+                key={review.id}
+                className="rounded-(--jp-radius) border border-jp-border bg-jp-cream p-5"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
@@ -222,7 +225,7 @@ export function ProductReviews({
                         {review.author}
                       </p>
                       {review.verified && (
-                        <span className="rounded bg-jp-matcha/15 px-1.5 py-0.5 text-[0.65rem] font-semibold text-jp-matcha uppercase">
+                        <span className="rounded bg-jp-gold/15 px-1.5 py-0.5 text-[0.65rem] font-semibold text-jp-gold uppercase">
                           Đã mua hàng
                         </span>
                       )}
@@ -245,8 +248,8 @@ export function ProductReviews({
         ) : (
           <div
             className={cn(
-              "flex flex-col items-center rounded-(--jp-radius)",
-              "px-6 py-10 text-center bg-jp-cream",
+              "flex flex-col items-center rounded-(--jp-radius) border border-jp-border",
+              "bg-jp-cream px-6 py-10 text-center",
             )}
           >
             <MessageSquare className="size-8 text-jp-muted" aria-hidden />

@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 const accentColors = {
   default: "border-jp-border",
-  food: "border-jp-matcha",
+  food: "border-jp-gold",
   beauty: "border-jp-sakura",
   supplement: "border-jp-indigo",
 } as const;

@@ -10,11 +10,17 @@ export function ProductBreadcrumb({ product }: { product: WcProduct }) {
       aria-label="Breadcrumb"
       className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-jp-muted"
     >
-      <Link href="/" className="hover:text-jp-indigo">
+      <Link
+        href="/"
+        className="cursor-pointer transition-colors duration-200 hover:text-jp-indigo"
+      >
         Trang chủ
       </Link>
       <ChevronRight className="size-3.5 shrink-0" aria-hidden />
-      <Link href="/shop" className="hover:text-jp-indigo">
+      <Link
+        href="/shop"
+        className="cursor-pointer transition-colors duration-200 hover:text-jp-indigo"
+      >
         Cửa hàng
       </Link>
       {category && (
@@ -22,7 +28,7 @@ export function ProductBreadcrumb({ product }: { product: WcProduct }) {
           <ChevronRight className="size-3.5 shrink-0" aria-hidden />
           <Link
             href={`/category/${category.slug}`}
-            className="hover:text-jp-indigo"
+            className="cursor-pointer transition-colors duration-200 hover:text-jp-indigo"
           >
             {category.name}
           </Link>

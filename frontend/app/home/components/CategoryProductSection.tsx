@@ -4,7 +4,7 @@ import type { WcProduct } from "@/lib/types";
 
 const accentColors = {
   default: "border-jp-border",
-  food: "border-jp-matcha",
+  food: "border-jp-gold",
   beauty: "border-jp-sakura",
   supplement: "border-jp-indigo",
 } as const;
@@ -35,7 +35,7 @@ export function CategoryProductSection({
         </div>
         <Link
           href={`/category/${categorySlug}`}
-          className="shrink-0 text-sm font-semibold uppercase tracking-wider text-jp-indigo hover:text-jp-matcha"
+          className="shrink-0 text-sm font-semibold uppercase tracking-wider text-jp-indigo hover:text-jp-gold"
         >
           Xem tất cả →
         </Link>

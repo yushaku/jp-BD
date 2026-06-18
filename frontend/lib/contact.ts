@@ -1,7 +1,7 @@
 export const contactInfo = {
   brand: "JP Bùi Đặng",
   intro:
-    "Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn về thực phẩm, mỹ phẩm & TPCN chính hãng từ Nhật Bản — tư vấn sản phẩm, đơn hàng và chính sách giao hàng.",
+    "Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn về thực phẩm, mỹ phẩm & TPCN chính hãng từ Nhật Bản - tư vấn sản phẩm, đơn hàng và chính sách giao hàng.",
   address: {
     title: "Địa chỉ",
     lines: [

@@ -1,11 +1,6 @@
 import Link from "next/link";
 import { Truck } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { contactInfo, policyLinks, supportLinks } from "@/lib/contact";
 
 export function ContactSupportSections() {
@@ -16,9 +11,7 @@ export function ContactSupportSections() {
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         <Card className="border-0 bg-white ring-0 shadow-none" id="ho-tro">
           <CardHeader>
-            <CardTitle className="text-base">
-              Hỗ trợ khách hàng
-            </CardTitle>
+            <CardTitle className="text-base">Hỗ trợ khách hàng</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-lg font-semibold text-jp-indigo">
@@ -52,7 +45,7 @@ export function ContactSupportSections() {
         <Card className="border-0 bg-white ring-0 shadow-none" id="van-chuyen">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Truck className="size-4 text-jp-matcha" />
+              <Truck className="size-4 text-jp-gold" />
               Phương thức vận chuyển
             </CardTitle>
           </CardHeader>
@@ -75,9 +68,7 @@ export function ContactSupportSections() {
 
         <Card className="border-0 bg-white ring-0 shadow-none" id="thanh-toan">
           <CardHeader>
-            <CardTitle className="text-base">
-              Phương thức thanh toán
-            </CardTitle>
+            <CardTitle className="text-base">Phương thức thanh toán</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <ul className="list-inside list-disc space-y-1">
@@ -92,10 +83,7 @@ export function ContactSupportSections() {
             <ul className="space-y-2">
               {policyLinks.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="hover:text-jp-indigo"
-                  >
+                  <Link href={link.href} className="hover:text-jp-indigo">
                     {link.label}
                   </Link>
                 </li>

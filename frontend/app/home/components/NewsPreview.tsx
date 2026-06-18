@@ -18,7 +18,7 @@ export function NewsPreview({ posts }: { posts: WpPost[] }) {
         </header>
         <Link
           href="/tin-tuc"
-          className="shrink-0 text-sm font-semibold uppercase tracking-wider text-jp-indigo hover:text-jp-matcha"
+          className="shrink-0 text-sm font-semibold uppercase tracking-wider text-jp-indigo hover:text-jp-gold"
         >
           Xem tất cả →
         </Link>
