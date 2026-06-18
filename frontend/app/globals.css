@@ -133,14 +133,28 @@
 }
 
 .banner-slider .swiper-pagination {
-  bottom: 12px;
+  bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  padding-bottom: 2px;
+}
+
+@media (min-width: 640px) {
+  .banner-slider .swiper-pagination {
+    bottom: max(14px, env(safe-area-inset-bottom, 0px));
+  }
 }
 
 .banner-slider .swiper-pagination-bullet {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   background: rgb(255 254 249 / 0.8);
   opacity: 1;
+}
+
+@media (min-width: 640px) {
+  .banner-slider .swiper-pagination-bullet {
+    width: 8px;
+    height: 8px;
+  }
 }
 
 .banner-slider .swiper-pagination-bullet-active {

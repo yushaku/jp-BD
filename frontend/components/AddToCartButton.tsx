@@ -1,13 +1,13 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAddToCart } from "@/hooks/use-cart";
 
 export function AddToCartButton({
   productId,
   stockStatus = "instock",
-  label = "Thêm vào giỏ",
+  label = "",
   className,
 }: {
   productId: number;
@@ -22,7 +22,7 @@ export function AddToCartButton({
     <Button
       type="button"
       variant="outline"
-      className={className ?? "w-full uppercase tracking-wider"}
+      className={className ?? "w-full uppercase tracking-wider cursor-pointer"}
       disabled={isPending || outOfStock}
       onClick={() => mutate({ productId, quantity: 1 })}
     >
@@ -34,7 +34,12 @@ export function AddToCartButton({
       ) : outOfStock ? (
         "Hết hàng"
       ) : (
-        label
+        <>
+          <ShoppingCart className="size-4" />
+          <span hidden={!label} className="text-xs font-bold uppercase">
+            {label}
+          </span>
+        </>
       )}
     </Button>
   );

@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { formatPrice, getSalePercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { getVolume } from "@/lib/woocommerce";
 import type { WcProduct } from "@/lib/types";
 import { AddToCartButton } from "./AddToCartButton";
 
@@ -12,21 +10,10 @@ const TOP_RANK_STYLES = [
   { bg: "bg-[#e8913a]", tip: "border-t-[#e8913a]" },
   { bg: "bg-[#f0a04b]", tip: "border-t-[#f0a04b]" },
   { bg: "bg-[#f5b85a]", tip: "border-t-[#f5b85a]" },
-  { bg: "bg-jp-muted", tip: "border-t-jp-muted" },
-  { bg: "bg-jp-muted", tip: "border-t-jp-muted" },
-  { bg: "bg-jp-muted", tip: "border-t-jp-muted" },
+  { bg: "bg-jp-gold", tip: "border-t-jp-gold" },
+  { bg: "bg-jp-gold", tip: "border-t-jp-gold" },
+  { bg: "bg-jp-gold", tip: "border-t-jp-gold" },
 ] as const;
-
-function getFakeReviewCount(productId: number): number {
-  return 36 + ((productId * 67) % 924);
-}
-
-function getDisplaySales(product: WcProduct): number {
-  if (product.total_sales != null && product.total_sales > 0) {
-    return product.total_sales;
-  }
-  return 120 + ((product.id * 41) % 880);
-}
 
 function getBrandLabel(product: WcProduct): string {
   return product.categories[0]?.name.toUpperCase() ?? "JP BÙI ĐẶNG";
@@ -36,7 +23,10 @@ function TopRankBadge({ rank }: { rank: number }) {
   const style = TOP_RANK_STYLES[Math.min(rank - 1, TOP_RANK_STYLES.length - 1)];
 
   return (
-    <div className="absolute top-0 left-0 z-10 w-6 text-center text-white sm:w-12">
+    <div
+      hidden={!rank}
+      className="absolute top-0 left-0 z-10 w-6 text-center text-white sm:w-12"
+    >
       <div className={cn("relative px-1.5 py-2 shadow-sm", style.bg)}>
         <span className="block text-[0.45rem] font-bold uppercase leading-none tracking-wide sm:text-[0.5rem]">
           Top
@@ -67,173 +57,84 @@ export function ProductCard({
 }) {
   const isBestseller = variant === "bestseller";
   const image = product.images[0];
-  const volume = getVolume(product);
   const salePrice = product.sale_price || product.price;
   const salePercent = product.on_sale
     ? getSalePercent(product.regular_price, salePrice)
     : null;
-  const reviewCount = getFakeReviewCount(product.id);
-  const monthlySales = getDisplaySales(product);
   const brand = getBrandLabel(product);
+  const productHref = `/product/${product.slug}`;
 
   return (
     <Card
       className={cn(
-        "overflow-hidden border-jp-border py-0 shadow-(--jp-shadow) transition hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(26,26,26,0.1)]",
-        isBestseller ? "bg-white" : "flex h-full flex-col bg-jp-cream",
+        "flex aspect-3/4 w-full flex-col gap-0 overflow-hidden rounded-2xl border-2 border-jp-border/50 p-0 transition-all duration-200",
+        "hover:border-jp-gold",
       )}
     >
-      <Link
-        href={`/product/${product.slug}`}
-        className={cn("block", !isBestseller && "flex flex-1 flex-col")}
-      >
-        <div
-          className={cn(
-            "relative overflow-hidden bg-white",
-            isBestseller ? "aspect-square" : "aspect-4/5",
-          )}
-        >
-          {rank != null && <TopRankBadge rank={rank} />}
+      <div className="relative min-h-0 flex-1 overflow-hidden">
+        {rank != null && <TopRankBadge rank={rank} />}
 
+        {salePercent && (
+          <Badge
+            variant="default"
+            className="absolute top-3 right-3 z-10 px-3 py-2 text-lg"
+          >
+            -{salePercent}%
+          </Badge>
+        )}
+
+        <Link
+          href={productHref}
+          className="flex size-full items-center justify-center"
+        >
           {image ? (
             <img
               src={image.src}
               alt={image.alt || product.name}
               loading="lazy"
               decoding="async"
-              className={cn(
-                "absolute inset-0 size-full transition-transform duration-300 group-hover/card:scale-[1.03]",
-                isBestseller ? "object-contain p-4" : "object-cover",
-              )}
+              className="size-full object-contain transition-transform duration-300 group-hover/card:scale-[1.1]"
             />
           ) : (
-            <div
-              className={cn(
-                "flex h-full items-center justify-center text-muted-foreground",
-                isBestseller
-                  ? "text-sm"
-                  : "px-2 text-center text-xs sm:text-sm",
-              )}
-            >
-              Không có ảnh
-            </div>
+            <span className="text-sm text-jp-muted">Không có ảnh</span>
           )}
+        </Link>
+      </div>
 
-          {salePercent && (
-            <Badge
-              variant="default"
-              className={cn(
-                "absolute z-10 border-0 font-bold",
-                isBestseller
-                  ? "top-2 right-2 bg-jp-matcha p-2 text-white sm:text-xs"
-                  : "right-1.5 bottom-1.5 bg-jp-vermillion px-1.5 py-0.5 text-[0.6rem] sm:right-2 sm:bottom-2 sm:text-xs",
-              )}
-            >
-              -{salePercent}%
-            </Badge>
-          )}
-        </div>
-
-        <CardContent
-          className={cn(
-            "px-3 sm:px-4",
-            isBestseller
-              ? "space-y-1.5 pt-3 pb-4 sm:pt-4"
-              : "flex flex-1 flex-col pt-3 pb-2 sm:pt-4",
-          )}
-        >
+      <div className="flex shrink-0 rounded-t-[18px] flex-col bg-jp-paper p-3 shadow sm:p-3.5">
+        <Link href={productHref} className="block min-w-0">
           {isBestseller && (
-            <p className="text-[0.6rem] font-medium tracking-[0.08em] text-jp-muted uppercase sm:text-[0.65rem]">
+            <p className="mb-0.5 text-[0.55rem] font-semibold tracking-widest text-jp-muted uppercase sm:text-[0.6rem]">
               {brand}
             </p>
           )}
 
-          <h3
-            className={cn(
-              "line-clamp-2 text-sm leading-snug font-semibold",
-              isBestseller ? "text-jp-ink sm:text-[0.95rem]" : "sm:text-[1.05rem]",
-            )}
-          >
+          <h3 className="line-clamp-1 text-sm leading-snug font-bold text-jp-ink sm:text-base">
             {product.name}
           </h3>
+        </Link>
 
-          {!isBestseller && volume && (
-            <span className="mt-1 block text-[0.65rem] text-muted-foreground sm:text-xs">
-              {volume}
-            </span>
-          )}
-
-          <div
-            className={cn(
-              "flex flex-wrap items-baseline gap-1.5 sm:gap-2",
-              isBestseller ? "pt-0.5" : "mt-2",
-            )}
-          >
-            <p
-              className={cn(
-                "font-semibold",
-                isBestseller
-                  ? "text-base font-bold text-jp-vermillion sm:text-lg"
-                  : "text-sm text-jp-gold sm:text-[0.95rem]",
-              )}
-            >
-              {formatPrice(product.on_sale ? salePrice : product.price)}
-            </p>
-            {product.on_sale && product.regular_price && (
-              <p
-                className={cn(
-                  "text-jp-muted line-through",
-                  isBestseller
-                    ? "text-xs sm:text-sm"
-                    : "text-[0.65rem] sm:text-xs",
-                )}
-              >
-                {formatPrice(product.regular_price)}
+        <div className="mt-1.5 flex items-end justify-between gap-2 sm:mt-2 sm:gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+              <p className="text-base font-bold text-jp-ink sm:text-lg">
+                {formatPrice(product.on_sale ? salePrice : product.price)}
               </p>
-            )}
-          </div>
-
-          <div
-            className={cn(
-              "flex items-center justify-between gap-1",
-              isBestseller ? "gap-2 pt-1" : "mt-2",
-            )}
-          >
-            <div className="flex min-w-0 items-center gap-0.5">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <Star
-                  key={index}
-                  className={cn(
-                    "size-3 shrink-0 sm:size-3.5",
-                    isBestseller
-                      ? "fill-[#f5c518] text-[#f5c518]"
-                      : "fill-jp-gold text-jp-gold",
-                  )}
-                  aria-hidden
-                />
-              ))}
-              <span className="ml-0.5 text-[0.65rem] text-jp-muted sm:text-xs">
-                ({reviewCount})
-              </span>
+              {product.on_sale && product.regular_price && (
+                <p className="text-[0.65rem] text-jp-muted line-through sm:text-xs">
+                  {formatPrice(product.regular_price)}
+                </p>
+              )}
             </div>
-            <span className="shrink-0 text-[0.65rem] whitespace-nowrap text-jp-muted sm:text-xs">
-              {isBestseller
-                ? `bán (${monthlySales})/tháng`
-                : `${monthlySales}/tháng`}
-            </span>
           </div>
-        </CardContent>
-      </Link>
 
-      {!isBestseller && (
-        <CardFooter className="border-0 bg-transparent px-3 pt-0 pb-3 sm:px-4 sm:pb-4">
           <AddToCartButton
             productId={product.id}
             stockStatus={product.stock_status}
-            className="h-8 w-full text-[0.65rem] uppercase tracking-wide sm:h-9 sm:text-xs"
+            className="h-8 shrink-0 rounded-lg border-0 bg-jp-indigo px-2.5 text-[0.6rem] font-semibold text-white uppercase tracking-wide hover:bg-jp-indigo/90 hover:text-white sm:h-9 sm:px-3 sm:text-[0.65rem]"
           />
-        </CardFooter>
-      )}
+        </div>
+      </div>
     </Card>
   );
 }

@@ -8,7 +8,7 @@ export function NewsPreview({ posts }: { posts: WpPost[] }) {
   }
 
   return (
-    <section className="mx-auto my-6 max-w-6xl px-6">
+    <section className="mx-auto my-12 max-w-6xl px-6">
       <div className="mb-6 flex flex-col items-center justify-between gap-3 border-b-2 border-jp-border pb-3 sm:flex-row sm:items-end">
         <header className="text-center sm:text-left">
           <h2 className="text-[1.65rem]">Tin tức</h2>

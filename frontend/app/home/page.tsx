@@ -21,7 +21,7 @@ export default async function HomePage() {
   const [hero, bestsellers, foodCat, beautyCat, tpcnCat, newsPosts] =
     await Promise.all([
       getHero(),
-      getPopularProducts(10),
+      getPopularProducts(8),
       getCategoryBySlug("thuc-pham-nhat"),
       getCategoryBySlug("my-pham-nhat"),
       getCategoryBySlug("tpcn"),

@@ -8,7 +8,10 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import type { BannerSlide } from "@/lib/types";
 
 const AUTO_PLAY_MS = 5000;
-const BANNER_HEIGHT = "h-[calc(100dvh-4rem)]";
+
+/** Mobile-first: capped height on small screens, full hero from lg up */
+const BANNER_SHELL =
+  "h-[clamp(13rem,48dvh,22rem)] sm:h-[clamp(15rem,50dvh,26rem)] md:h-[clamp(17rem,52dvh,30rem)] lg:h-[clamp(24rem,calc(100dvh-4.5rem),42rem)]";
 
 function BannerSlideMedia({
   slide,
@@ -24,7 +27,7 @@ function BannerSlideMedia({
       loading={priority ? "eager" : "lazy"}
       decoding="async"
       fetchPriority={priority ? "high" : "auto"}
-      className="absolute inset-0 size-full object-cover object-center"
+      className="absolute inset-0 size-full object-cover object-[center_35%] sm:object-center"
     />
   );
 
@@ -50,7 +53,7 @@ export function BannerSlider({ slides }: { slides: BannerSlide[] }) {
   return (
     <section
       aria-label="Banner khuyến mãi"
-      className={`banner-slider relative w-full border-b border-jp-border bg-jp-paper ${BANNER_HEIGHT}`}
+      className={`banner-slider relative w-full overflow-hidden border-b border-jp-border bg-jp-paper ${BANNER_SHELL}`}
     >
       <Swiper
         modules={[Navigation, Pagination, Autoplay]}
@@ -80,13 +83,11 @@ export function BannerSlider({ slides }: { slides: BannerSlide[] }) {
             swiper.params.navigation.nextEl = nextRef.current;
           }
         }}
-        className={`w-full ${BANNER_HEIGHT}`}
+        className={`size-full ${BANNER_SHELL}`}
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={slide.id} className="h-full!">
-            <div
-              className={`relative w-full overflow-hidden bg-jp-paper ${BANNER_HEIGHT}`}
-            >
+            <div className="relative size-full overflow-hidden bg-jp-paper">
               <BannerSlideMedia slide={slide} priority={index === 0} />
             </div>
           </SwiperSlide>
@@ -99,7 +100,7 @@ export function BannerSlider({ slides }: { slides: BannerSlide[] }) {
             ref={prevRef}
             type="button"
             aria-label="Banner trước"
-            className="absolute left-2 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-jp-cream/90 text-jp-ink shadow-(--jp-shadow) transition hover:bg-white md:left-4 md:size-10"
+            className="absolute top-1/2 left-2 z-10 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-jp-cream/90 text-jp-ink shadow-(--jp-shadow) transition hover:bg-white sm:flex md:left-4 md:size-10"
           >
             <ChevronLeft className="size-5" />
           </button>
@@ -107,7 +108,7 @@ export function BannerSlider({ slides }: { slides: BannerSlide[] }) {
             ref={nextRef}
             type="button"
             aria-label="Banner tiếp theo"
-            className="absolute right-2 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-jp-cream/90 text-jp-ink shadow-(--jp-shadow) transition hover:bg-white md:right-4 md:size-10"
+            className="absolute top-1/2 right-2 z-10 hidden size-9 -translate-y-1/2 items-center justify-center rounded-full bg-jp-cream/90 text-jp-ink shadow-(--jp-shadow) transition hover:bg-white sm:flex md:right-4 md:size-10"
           >
             <ChevronRight className="size-5" />
           </button>

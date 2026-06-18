@@ -17,7 +17,7 @@ export function ProductGrid({
   const gridClassName =
     columns === "shop"
       ? "grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3 lg:gap-5"
-      : "grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-5 lg:gap-5";
+      : "grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4 lg:gap-5";
 
   return (
     <div className={gridClassName}>
