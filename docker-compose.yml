@@ -31,12 +31,18 @@ services:
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
       WORDPRESS_DB_USER: ${MYSQL_USER}
       WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_URL: ${WORDPRESS_URL:-http://localhost:8080}
       WORDPRESS_DEBUG: "1"
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
       WORDPRESS_CONFIG_EXTRA: |
         define('WP_DEBUG_LOG', true);
         define('WP_DEBUG_DISPLAY', false);
         define('SCRIPT_DEBUG', true);
+        $$wp_url = getenv('WORDPRESS_URL');
+        if ($$wp_url) {
+          define('WP_HOME', $$wp_url);
+          define('WP_SITEURL', $$wp_url);
+        }
         if (isset($$_SERVER['HTTP_X_FORWARDED_PROTO']) && $$_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') {
           $$_SERVER['HTTPS'] = 'on';
         }
@@ -85,6 +91,7 @@ services:
       MOMO_PARTNER_CODE: ${MOMO_PARTNER_CODE:-}
       MOMO_ACCESS_KEY: ${MOMO_ACCESS_KEY:-}
       MOMO_SECRET_KEY: ${MOMO_SECRET_KEY:-}
+      PHP_MEMORY_LIMIT: 512M
     volumes:
       - wordpress_data:/var/www/html
       - ./scripts:/scripts

@@ -1,6 +1,11 @@
 # Bare-metal example: services on host ports 3000 (Next.js) and 8080 (WordPress).
 # Copy to sos.local.conf and disable sos.conf if both are mounted.
 
+map $http_x_forwarded_proto $proxy_x_forwarded_proto {
+    default $http_x_forwarded_proto;
+    ""      $scheme;
+}
+
 upstream nextjs {
     server 127.0.0.1:3000;
     keepalive 16;
@@ -8,7 +13,7 @@ upstream nextjs {
 
 upstream wordpress {
     server 127.0.0.1:8080;
-    keepalive 16;
+    # No keepalive — Apache returns 404 when nginx reuses upstream sockets.
 }
 
 server {
@@ -18,47 +23,47 @@ server {
     client_max_body_size 64M;
 
     location ^~ /wp-admin {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
     }
 
     location = /wp-login.php {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
     }
 
     location ^~ /wp-json {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
     }
 
     location ^~ /wp-content {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
     }
 
     location ^~ /wp-includes {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
     }
 
     location ^~ /checkout {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
     }
 
     location ^~ /my-account {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
     }
 
     location ^~ /wc-api {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
     }
 
     location = /wp-cron.php {
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
     }
 
@@ -83,7 +88,7 @@ server {
     location = /__proxy_wc_ajax {
         internal;
         rewrite ^ /$is_args$args break;
-        include /etc/nginx/snippets/proxy-headers.conf;
+        include /etc/nginx/snippets/proxy-headers-wordpress.conf;
         proxy_pass http://wordpress;
         proxy_read_timeout 120s;
     }

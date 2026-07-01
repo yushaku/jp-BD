@@ -219,6 +219,8 @@ Cấu hình sẵn trong `nginx/conf.d/sos.conf`. Dùng `./scripts/mode.sh local`
 
 **Bare metal** (Next :3000, WP :8080): copy `nginx/conf.d/sos.local.conf.example` → `sos.local.conf`.
 
+`sos.conf` dùng Docker DNS (`resolver 127.0.0.11` + `resolve` trên upstream) để sau khi restart WordPress/Next.js, `/wp-content/*` không còn 404 qua nginx :80.
+
 ## Cấu trúc repo
 
 ```

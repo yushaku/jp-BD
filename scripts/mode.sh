@@ -50,10 +50,9 @@ set_env_var() {
 sync_wp_urls() {
   local url="$1"
   log "WordPress home/siteurl → $url"
-  docker compose --profile cli run --rm --entrypoint wp wpcli \
-    option update home "$url" >/dev/null
-  docker compose --profile cli run --rm --entrypoint wp wpcli \
-    option update siteurl "$url" >/dev/null
+  docker compose --profile cli run --rm --entrypoint bash wpcli -c \
+    "wp --allow-root --skip-plugins --skip-themes option update home '$url' && \
+     wp --allow-root --skip-plugins --skip-themes option update siteurl '$url'"
 }
 
 restart_stack() {
@@ -61,6 +60,7 @@ restart_stack() {
   log "Restarting containers…"
   if [ "$profile" = "nginx" ]; then
     docker compose --profile nginx up -d nextjs wordpress nginx
+    docker compose exec nginx nginx -s reload 2>/dev/null || true
   else
     docker compose up -d nextjs wordpress
     if docker compose ps nginx 2>/dev/null | grep -q '(running)'; then
@@ -94,8 +94,8 @@ cmd_local() {
   set_env_var NEXT_PUBLIC_WP_URL "$url"
   set_env_var SOS_MODE "local"
   echo "local" >"$MODE_FILE"
-  sync_wp_urls "$url"
   restart_stack nginx
+  sync_wp_urls "$url"
   log "Ready — storefront: $url  |  admin: $url/wp-admin"
 }
 
@@ -106,8 +106,8 @@ cmd_ports() {
   set_env_var NEXT_PUBLIC_WP_URL "$wp_url"
   set_env_var SOS_MODE "ports"
   echo "ports" >"$MODE_FILE"
-  sync_wp_urls "$wp_url"
   restart_stack ""
+  sync_wp_urls "$wp_url"
   log "Ready — storefront: http://localhost:3000  |  admin: $wp_url/wp-admin"
 }
 
@@ -121,8 +121,8 @@ cmd_tunnel() {
   set_env_var NEXT_PUBLIC_WP_URL "$url"
   set_env_var SOS_MODE "tunnel"
   echo "tunnel" >"$MODE_FILE"
-  sync_wp_urls "$url"
   restart_stack nginx
+  sync_wp_urls "$url"
   log "Ready — storefront: $url  |  admin: $url/wp-admin"
   log "Start tunnel: cloudflared tunnel run yuchi-local"
 }
