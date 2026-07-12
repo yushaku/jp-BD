@@ -7,12 +7,12 @@ import type { WcProduct } from "@/lib/types";
 import { AddToCartButton } from "./AddToCartButton";
 
 const TOP_RANK_STYLES = [
-  { bg: "bg-[#e8913a]", tip: "border-t-[#e8913a]" },
-  { bg: "bg-[#f0a04b]", tip: "border-t-[#f0a04b]" },
-  { bg: "bg-[#f5b85a]", tip: "border-t-[#f5b85a]" },
-  { bg: "bg-jp-gold", tip: "border-t-jp-gold" },
-  { bg: "bg-jp-gold", tip: "border-t-jp-gold" },
-  { bg: "bg-jp-gold", tip: "border-t-jp-gold" },
+  { bg: "bg-[#e8913a]", tip: "bg-[#e8913a]" },
+  { bg: "bg-[#f0a04b]", tip: "bg-[#f0a04b]" },
+  { bg: "bg-[#f5b85a]", tip: "bg-[#f5b85a]" },
+  { bg: "bg-jp-gold", tip: "bg-jp-gold" },
+  { bg: "bg-jp-gold", tip: "bg-jp-gold" },
+  { bg: "bg-jp-gold", tip: "bg-jp-gold" },
 ] as const;
 
 function getBrandLabel(product: WcProduct): string {
@@ -25,9 +25,9 @@ function TopRankBadge({ rank }: { rank: number }) {
   return (
     <div
       hidden={!rank}
-      className="absolute top-0 left-0 z-10 w-6 text-center text-white sm:w-12"
+      className="absolute top-0 left-0 z-10 w-10 text-center text-white sm:w-12"
     >
-      <div className={cn("relative px-1.5 py-2 shadow-sm", style.bg)}>
+      <div className={cn("relative w-full px-1.5 py-2 shadow-sm", style.bg)}>
         <span className="block text-[0.45rem] font-bold uppercase leading-none tracking-wide sm:text-[0.5rem]">
           Top
         </span>
@@ -36,9 +36,10 @@ function TopRankBadge({ rank }: { rank: number }) {
         </span>
         <span
           className={cn(
-            "absolute -bottom-2 left-1/2 block size-0 -translate-x-1/2 border-x-22 border-t-8 border-x-transparent",
+            "absolute -bottom-2 left-0 block h-2 w-full",
             style.tip,
           )}
+          style={{ clipPath: "polygon(0 0, 100% 0, 50% 100%)" }}
           aria-hidden
         />
       </div>

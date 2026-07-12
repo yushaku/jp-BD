@@ -23,11 +23,22 @@ async function wcFetch<T>(
     if (value) url.searchParams.set(key, value);
   });
 
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  // ponytail: internal docker hits http://wordpress — WC only accepts key auth when is_ssl()
+  if (url.protocol === "http:") {
+    headers["X-Forwarded-Proto"] = "https";
+  }
+  if (url.protocol === "https:") {
+    headers.Authorization = authHeader();
+  } else {
+    url.searchParams.set("consumer_key", wcConsumerKey);
+    url.searchParams.set("consumer_secret", wcConsumerSecret);
+  }
+
   const res = await fetch(url.toString(), {
-    headers: {
-      Authorization: authHeader(),
-      "Content-Type": "application/json",
-    },
+    headers,
     next: { revalidate: REVALIDATE },
   });
 

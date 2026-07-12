@@ -1,5 +1,4 @@
 import { TrustBadges } from "@/components/TrustBadges";
-import { Hero } from "@/components/Hero";
 import { Section } from "@/components/Section";
 import { getHero } from "@/lib/sos-api";
 import {
@@ -36,9 +35,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <AnnouncementBar />
-
-      <Hero data={hero} />
+      <AnnouncementBar data={hero} />
 
       <Section title="Bán chạy" description="Được khách hàng tin chọn nhất">
         <BestsellerGrid products={bestsellers} />

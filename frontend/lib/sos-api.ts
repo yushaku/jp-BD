@@ -1,6 +1,6 @@
 import { wpApiUrl } from "./config";
-import { DEFAULT_BANNER_SLIDES } from "./home-banners";
-import type { BannerSlide, HeroData, MenuItem, ProductReviewsData } from "./types";
+import { DEFAULT_PROMO_HERO } from "./home-banners";
+import type { HeroData, MenuItem, ProductReviewsData, PromoHeroData } from "./types";
 
 const HERO_REVALIDATE = 300;
 
@@ -30,12 +30,15 @@ export async function getHero(): Promise<HeroData> {
   }
 }
 
-export async function getBannerSlides(): Promise<BannerSlide[]> {
+export async function getPromoHero(): Promise<PromoHeroData> {
   try {
-    const slides = await sosFetch<BannerSlide[]>("/banners");
-    return slides.length > 0 ? slides : DEFAULT_BANNER_SLIDES;
+    const data = await sosFetch<PromoHeroData>("/promo-hero");
+    if (!data.feature?.src) {
+      return DEFAULT_PROMO_HERO;
+    }
+    return data;
   } catch {
-    return DEFAULT_BANNER_SLIDES;
+    return DEFAULT_PROMO_HERO;
   }
 }
 

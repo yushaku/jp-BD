@@ -16,6 +16,8 @@ export const contactInfo = {
     hotlineHref: "tel:+84901234567",
     email: "support@example.com",
     emailHref: "mailto:support@example.com",
+    zaloHref: "https://zalo.me/84901234567",
+    messengerHref: "https://m.me/jpbuidang",
   },
   hours: {
     title: "Giờ hoạt động",

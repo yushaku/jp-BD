@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "swiper/swiper-bundle.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -124,39 +123,4 @@
     font-family: var(--font-quicksand), system-ui, sans-serif;
     font-weight: 600;
   }
-}
-
-.banner-slider .swiper,
-.banner-slider .swiper-wrapper,
-.banner-slider .swiper-slide {
-  height: 100%;
-}
-
-.banner-slider .swiper-pagination {
-  bottom: max(10px, env(safe-area-inset-bottom, 0px));
-  padding-bottom: 2px;
-}
-
-@media (min-width: 640px) {
-  .banner-slider .swiper-pagination {
-    bottom: max(14px, env(safe-area-inset-bottom, 0px));
-  }
-}
-
-.banner-slider .swiper-pagination-bullet {
-  width: 7px;
-  height: 7px;
-  background: rgb(255 254 249 / 0.8);
-  opacity: 1;
-}
-
-@media (min-width: 640px) {
-  .banner-slider .swiper-pagination-bullet {
-    width: 8px;
-    height: 8px;
-  }
-}
-
-.banner-slider .swiper-pagination-bullet-active {
-  background: var(--jp-vermillion);
 }

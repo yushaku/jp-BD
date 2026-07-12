@@ -3,6 +3,7 @@ import { Quicksand } from "next/font/google";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Providers } from "@/components/providers";
+import { SupportChannels } from "@/components/SupportChannels";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
@@ -33,6 +34,7 @@ export default function RootLayout({
           <Header />
           <main>{children}</main>
           <Footer />
+          <SupportChannels />
         </Providers>
       </body>
     </html>

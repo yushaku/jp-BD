@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ContactInfoGrid, ContactForm } from "./components/";
+import { ContactInfoGrid, ContactMap, ContactForm } from "./components/";
 import { contactInfo } from "@/lib/contact";
 
 export const metadata: Metadata = {
@@ -22,6 +22,7 @@ export default function ContactPage() {
 
       <ContactInfoGrid />
       <ContactForm />
+      <ContactMap />
     </section>
   );
 }

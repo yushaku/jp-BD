@@ -57,6 +57,35 @@ export interface BannerSlide {
   src: string;
   alt: string;
   href?: string;
+  title?: string;
+  subtitle?: string;
+  cta?: string;
+}
+
+export interface SidePromo {
+  id: string;
+  title: string;
+  subtitle?: string;
+  href: string;
+  cta: string;
+  src: string;
+  alt: string;
+}
+
+export interface CountdownPromo {
+  id: string;
+  title: string;
+  href: string;
+  cta: string;
+  src: string;
+  alt: string;
+  endDate: string;
+}
+
+export interface PromoHeroData {
+  feature: BannerSlide;
+  countdown: CountdownPromo;
+  sidePromos: SidePromo[];
 }
 
 export interface MenuItem {
