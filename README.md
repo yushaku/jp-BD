@@ -19,11 +19,11 @@ docker compose --profile cli run --rm --entrypoint bash wpcli /scripts/setup.sh
 
 Truy cập:
 
-| Dịch vụ | URL |
-|---------|-----|
-| Cửa hàng | http://localhost:8080 |
-| wp-admin | http://localhost:8080/wp-admin |
-| phpMyAdmin | http://localhost:8081 |
+| Dịch vụ    | URL                            |
+| ---------- | ------------------------------ |
+| Cửa hàng   | http://localhost:8080          |
+| wp-admin   | http://localhost:8080/wp-admin |
+| phpMyAdmin | http://localhost:8081          |
 
 **Đăng nhập admin mặc định** (đổi ngay sau lần đăng nhập đầu):
 
@@ -65,12 +65,12 @@ docker compose --profile cli run --rm --entrypoint bash wpcli /scripts/setup.sh
 
 5. Cấu hình trong **WooCommerce → Cài đặt → Thanh toán → VNPAY**:
 
-| Trường | Giá trị sandbox (ví dụ) |
-|--------|-------------------------|
-| Terminal ID | `VNPAY_TMN_CODE` trong `.env` |
-| Secret Key | `VNPAY_HASH_SECRET` trong `.env` |
-| Url Pay | `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html` |
-| Locale | `vn` |
+| Trường      | Giá trị sandbox (ví dụ)                              |
+| ----------- | ---------------------------------------------------- |
+| Terminal ID | `VNPAY_TMN_CODE` trong `.env`                        |
+| Secret Key  | `VNPAY_HASH_SECRET` trong `.env`                     |
+| Url Pay     | `https://sandbox.vnpayment.vn/paymentv2/vpcpay.html` |
+| Locale      | `vn`                                                 |
 
 ## Thanh toán MoMo (sandbox)
 
@@ -121,12 +121,12 @@ docker compose down -v
 
 Child theme nằm tại `wp-content/themes/sos-beauty/` (mount vào container).
 
-| File | Vai trò |
-|------|---------|
-| `style.css` | Palette Washi & Matcha, font Lora + Be Vietnam Pro |
-| `front-page.php` | Hero, 3 danh mục (thực phẩm / mỹ phẩm / TPCN) |
-| `functions.php` | Tab Thành phần / Cách dùng / Lưu ý TPCN |
-| `woocommerce/single-product/title.php` | Hiển thị thương hiệu |
+| File                                   | Vai trò                                            |
+| -------------------------------------- | -------------------------------------------------- |
+| `style.css`                            | Palette Washi & Matcha, font Lora + Be Vietnam Pro |
+| `front-page.php`                       | Hero, 3 danh mục (thực phẩm / mỹ phẩm / TPCN)      |
+| `functions.php`                        | Tab Thành phần / Cách dùng / Lưu ý TPCN            |
+| `woocommerce/single-product/title.php` | Hiển thị thương hiệu                               |
 
 **Palette:** `--jp-matcha` (food), `--jp-sakura` (beauty), `--jp-indigo` (TPCN), `--jp-vermillion` (CTA)
 
