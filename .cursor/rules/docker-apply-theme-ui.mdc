@@ -1,0 +1,24 @@
+---
+description: After sos-beauty UI changes, always restart Docker + flush WP cache so new CSS/JS apply.
+globs: wp-content/themes/sos-beauty/**
+alwaysApply: false
+---
+
+# Apply theme UI via Docker
+
+After **any** change under `wp-content/themes/sos-beauty/` (CSS, PHP, JS, assets):
+
+1. Bump `SOS_BEAUTY_VERSION` in `functions.php` and `Version` in `style.css` (cache bust).
+2. Run Docker apply (needs host Docker / OrbStack; use `required_permissions: ["all"]`):
+
+```bash
+cd /Users/nami/work/jp-hadang
+docker compose up -d
+docker compose restart wordpress
+docker compose --profile cli run --rm --entrypoint wp wpcli --allow-root theme activate sos-beauty
+docker compose --profile cli run --rm --entrypoint wp wpcli --allow-root cache flush
+```
+
+3. Verify `http://localhost:8080` responds (curl or browser). Tell user hard-refresh if browser still stale.
+
+Do **not** skip this after UI work — bind-mount alone not enough when WP object/page cache or admin-ajax CDN-style headers linger.

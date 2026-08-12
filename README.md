@@ -124,13 +124,19 @@ Child theme nằm tại `wp-content/themes/sos-beauty/` (mount vào container).
 | File                                   | Vai trò                                            |
 | -------------------------------------- | -------------------------------------------------- |
 | `style.css`                            | Palette Washi & Matcha, font Lora + Be Vietnam Pro |
-| `front-page.php`                       | Hero, 3 danh mục (thực phẩm / mỹ phẩm / TPCN)      |
-| `functions.php`                        | Tab Thành phần / Cách dùng / Lưu ý TPCN            |
-| `woocommerce/single-product/title.php` | Hiển thị thương hiệu                               |
+| `front-page.php`                       | Promo grid, danh mục, sản phẩm, trust strip        |
+| `template-parts/promo-hero.php`        | Lưới ưu đãi (feature + countdown + 2 tile)         |
+| `functions.php`                        | Tab sản phẩm, Customizer, hooks WooCommerce        |
+| `woocommerce/content-product.php`      | Thẻ sản phẩm — thương hiệu trên archive            |
+| `woocommerce/single-product/title.php` | Hiển thị thương hiệu PDP                           |
 
-**Palette:** `--jp-matcha` (food), `--jp-sakura` (beauty), `--jp-indigo` (TPCN), `--jp-vermillion` (CTA)
+**Palette:** `--jp-matcha` (accent), `--jp-matcha-text` / `--jp-gold` / `--jp-vermillion` (text+CTA, WCAG AA vs cream), `--jp-indigo` (footer bg). Text on footer: `--jp-footer-text` / `--jp-footer-muted` — no low-opacity body copy.
 
-Đổi text hero: **Giao diện → Tùy chỉnh → JP Bùi Đặng Hero**
+Chỉnh promo trang chủ: **Giao diện → Tùy chỉnh → JP Bùi Đặng Promo Hero** (ảnh, tiêu đề, CTA, countdown ISO 8601).
+
+Footer (địa chỉ, hotline, email, link BCT): **Giao diện → Tùy chỉnh → JP Bùi Đặng Footer**.
+
+Mục **JP Bùi Đặng Hero** (text) giữ cho tương thích — không còn hiển thị trên trang chủ.
 
 Kích hoạt lại theme:
 

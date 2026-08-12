@@ -92,6 +92,8 @@ configure_woocommerce() {
   $WP option update woocommerce_weight_unit 'kg'
   $WP option update woocommerce_dimension_unit 'cm'
   $WP option update woocommerce_calc_taxes 'no'
+  $WP option update woocommerce_coming_soon 'no'
+  $WP option update woocommerce_store_pages_only 'no'
 
   $WP option update woocommerce_cod_settings '{"enabled":"yes","title":"Thanh toán khi nhận hàng (COD)","description":"Thanh toán tiền mặt khi nhận hàng.","instructions":"Vui lòng chuẩn bị đúng số tiền khi nhận hàng.","enable_for_methods":"","enable_for_virtual":"no"}' --format=json
 
@@ -147,6 +149,26 @@ create_pages() {
       --porcelain)
   fi
 
+  policy_privacy_id=$($WP post list --post_type=page --name=chinh-sach-bao-mat --field=ID 2>/dev/null | head -1)
+  if [ -z "$policy_privacy_id" ]; then
+    $WP post create --post_type=page \
+      --post_title='Chính sách bảo mật' \
+      --post_name=chinh-sach-bao-mat \
+      --post_status=publish \
+      --post_content='Chúng tôi cam kết bảo mật thông tin cá nhân khách hàng. Dữ liệu chỉ dùng để xử lý đơn hàng và chăm sóc khách hàng, không bán cho bên thứ ba.' \
+      --porcelain >/dev/null
+  fi
+
+  guide_id=$($WP post list --post_type=page --name=huong-dan-mua-hang --field=ID 2>/dev/null | head -1)
+  if [ -z "$guide_id" ]; then
+    $WP post create --post_type=page \
+      --post_title='Hướng dẫn mua hàng' \
+      --post_name=huong-dan-mua-hang \
+      --post_status=publish \
+      --post_content='1. Chọn sản phẩm và thêm vào giỏ. 2. Kiểm tra giỏ hàng. 3. Điền thông tin giao hàng. 4. Chọn phương thức thanh toán (COD / VNPay / MoMo). 5. Xác nhận đơn.' \
+      --porcelain >/dev/null
+  fi
+
   contact_id=$($WP post list --post_type=page --name=lien-he --field=ID 2>/dev/null | head -1)
   if [ -z "$contact_id" ]; then
     contact_id=$($WP post create --post_type=page \
@@ -181,6 +203,8 @@ create_pages() {
 
 create_menu() {
   log "Creating navigation menu..."
+  ensure_product_category_tree
+
   local menu_id
   menu_id=$($WP menu list --format=csv 2>/dev/null | awk -F, 'NR>1 && $2 ~ /Main Menu/ {gsub(/"/,"",$1); print $1; exit}')
 
@@ -196,20 +220,20 @@ create_menu() {
     log "Cleared existing menu items."
   fi
 
-  local front_id shop_id about_id contact_id cat_food cat_beauty cat_tpcn
+  local front_id shop_id about_id contact_id cat_food cat_beauty cat_goods
   front_id=$($WP option get page_on_front 2>/dev/null || echo "")
   shop_id=$($WP option get woocommerce_shop_page_id 2>/dev/null || echo "")
   about_id=$($WP post list --post_type=page --name=gioi-thieu --field=ID 2>/dev/null | head -1)
   contact_id=$($WP post list --post_type=page --name=lien-he --field=ID 2>/dev/null | head -1)
-  cat_food=$($WP term list product_cat --slug=thuc-pham-nhat --field=term_id 2>/dev/null | head -1)
   cat_beauty=$($WP term list product_cat --slug=my-pham-nhat --field=term_id 2>/dev/null | head -1)
-  cat_tpcn=$($WP term list product_cat --slug=tpcn --field=term_id 2>/dev/null | head -1)
+  cat_goods=$($WP term list product_cat --slug=hang-tieu-dung --field=term_id 2>/dev/null | head -1)
+  cat_food=$($WP term list product_cat --slug=thuc-pham-nhat --field=term_id 2>/dev/null | head -1)
 
   [ -n "$front_id" ] && $WP menu item add-post "$menu_id" "$front_id" 2>/dev/null || true
   [ -n "$shop_id" ] && $WP menu item add-post "$menu_id" "$shop_id" 2>/dev/null || true
-  [ -n "$cat_food" ] && $WP menu item add-term "$menu_id" product_cat "$cat_food" 2>/dev/null || true
   [ -n "$cat_beauty" ] && $WP menu item add-term "$menu_id" product_cat "$cat_beauty" 2>/dev/null || true
-  [ -n "$cat_tpcn" ] && $WP menu item add-term "$menu_id" product_cat "$cat_tpcn" 2>/dev/null || true
+  [ -n "$cat_goods" ] && $WP menu item add-term "$menu_id" product_cat "$cat_goods" 2>/dev/null || true
+  [ -n "$cat_food" ] && $WP menu item add-term "$menu_id" product_cat "$cat_food" 2>/dev/null || true
   [ -n "$about_id" ] && $WP menu item add-post "$menu_id" "$about_id" 2>/dev/null || true
   [ -n "$contact_id" ] && $WP menu item add-post "$menu_id" "$contact_id" 2>/dev/null || true
 
@@ -217,36 +241,93 @@ create_menu() {
   $WP menu location assign "$menu_id" handheld 2>/dev/null || true
 }
 
+# Ensure product category exists; echo term_id.
+# Usage: ensure_term NAME SLUG [PARENT_ID]
+ensure_term() {
+  local name="$1" slug="$2" parent_id="${3:-0}"
+  local id
+  id=$($WP term list product_cat --slug="$slug" --field=term_id 2>/dev/null | head -1)
+  if [ -z "$id" ]; then
+    if [ -n "$parent_id" ] && [ "$parent_id" != "0" ]; then
+      id=$($WP term create product_cat "$name" --slug="$slug" --parent="$parent_id" --porcelain)
+    else
+      id=$($WP term create product_cat "$name" --slug="$slug" --porcelain)
+    fi
+  else
+    $WP term update product_cat "$id" --name="$name" >/dev/null 2>&1 || true
+    if [ -n "$parent_id" ] && [ "$parent_id" != "0" ]; then
+      $WP term update product_cat "$id" --parent="$parent_id" >/dev/null 2>&1 || true
+    elif [ "$parent_id" = "0" ]; then
+      $WP term update product_cat "$id" --parent=0 >/dev/null 2>&1 || true
+    fi
+  fi
+  echo "$id"
+}
+
+ensure_product_category_tree() {
+  log "Ensuring product category tree..."
+
+  local cat_beauty cat_goods cat_food cat_tpcn
+  local cat_skin cat_hair cat_body
+
+  cat_beauty=$(ensure_term 'Mỹ phẩm' 'my-pham-nhat' 0)
+  cat_goods=$(ensure_term 'Hàng tiêu dùng' 'hang-tieu-dung' 0)
+  cat_food=$(ensure_term 'Thực phẩm' 'thuc-pham-nhat' 0)
+  cat_tpcn=$(ensure_term 'TPCN' 'tpcn' "$cat_goods")
+
+  cat_skin=$(ensure_term 'Chăm sóc da' 'cham-soc-da' "$cat_beauty")
+  ensure_term 'Toner, nước hoa hồng' 'toner' "$cat_skin" >/dev/null
+  ensure_term 'Serum' 'serum' "$cat_skin" >/dev/null
+  ensure_term 'Kem dưỡng' 'kem-duong' "$cat_skin" >/dev/null
+  ensure_term 'Mặt nạ' 'mat-na' "$cat_skin" >/dev/null
+  ensure_term 'Rửa mặt' 'rua-mat' "$cat_skin" >/dev/null
+  ensure_term 'Tẩy trang' 'tay-trang' "$cat_skin" >/dev/null
+
+  cat_hair=$(ensure_term 'Chăm sóc tóc' 'cham-soc-toc' "$cat_beauty")
+  ensure_term 'Dầu gội' 'dau-goi' "$cat_hair" >/dev/null
+  ensure_term 'Dầu xả' 'dau-xa' "$cat_hair" >/dev/null
+
+  cat_body=$(ensure_term 'Cơ thể' 'cham-soc-co-the' "$cat_beauty")
+  ensure_term 'Sữa tắm' 'sua-tam' "$cat_body" >/dev/null
+  ensure_term 'Xà phòng' 'xa-phong' "$cat_body" >/dev/null
+  ensure_term 'Chăm sóc răng miệng' 'cham-soc-rang-mieng' "$cat_body" >/dev/null
+
+  log "Category tree ready (beauty=$cat_beauty goods=$cat_goods food=$cat_food tpcn=$cat_tpcn)."
+}
+
 create_demo_products() {
   log "Creating demo products (food, beauty, TPCN)..."
-  local cat_food cat_beauty cat_tpcn
+  ensure_product_category_tree
 
+  local cat_food cat_beauty cat_tpcn cat_serum cat_kem
   cat_food=$($WP term list product_cat --slug=thuc-pham-nhat --field=term_id 2>/dev/null | head -1)
-  if [ -z "$cat_food" ]; then
-    cat_food=$($WP term create product_cat 'Thực phẩm Nhật' --slug=thuc-pham-nhat --porcelain)
-  fi
-
   cat_beauty=$($WP term list product_cat --slug=my-pham-nhat --field=term_id 2>/dev/null | head -1)
-  if [ -z "$cat_beauty" ]; then
-    cat_beauty=$($WP term create product_cat 'Mỹ phẩm Nhật' --slug=my-pham-nhat --porcelain)
-  fi
-
   cat_tpcn=$($WP term list product_cat --slug=tpcn --field=term_id 2>/dev/null | head -1)
-  if [ -z "$cat_tpcn" ]; then
-    cat_tpcn=$($WP term create product_cat 'TPCN' --slug=tpcn --porcelain)
-  fi
+  cat_serum=$($WP term list product_cat --slug=serum --field=term_id 2>/dev/null | head -1)
+  cat_kem=$($WP term list product_cat --slug=kem-duong --field=term_id 2>/dev/null | head -1)
 
   create_beauty_product "bot-matcha-uji" "Bột matcha Uji Kyoto" 320000 45 "$cat_food"
   create_beauty_product "miso-vang" "Miso tương vàng Hokkaido" 185000 60 "$cat_food"
   create_beauty_product "banh-gao-senbei" "Bánh gạo senbei mix vị" 95000 80 "$cat_food"
 
-  create_beauty_product "serum-vitamin-c" "Serum Vitamin C 20%" 450000 40 "$cat_beauty"
-  create_beauty_product "kem-duong-am" "Kem dưỡng ẩm Hyaluronic" 380000 55 "$cat_beauty"
+  create_beauty_product "serum-vitamin-c" "Serum Vitamin C 20%" 450000 40 "${cat_serum:-$cat_beauty}"
+  create_beauty_product "kem-duong-am" "Kem dưỡng ẩm Hyaluronic" 380000 55 "${cat_kem:-$cat_beauty}"
   create_beauty_product "son-kem-li" "Son kem lì Velvet Rose" 290000 35 "$cat_beauty"
 
   create_beauty_product "collagen-nhat" "Collagen peptide Nhật Bản" 680000 30 "$cat_tpcn"
   create_beauty_product "vitamin-c-vien" "Vitamin C 1000mg" 420000 50 "$cat_tpcn"
   create_beauty_product "omega-3-dha" "Omega-3 DHA EPA" 550000 25 "$cat_tpcn"
+
+  # Re-map existing demo products into leaf categories when re-running setup.
+  local pid
+  pid=$($WP post list --post_type=product --name=serum-vitamin-c --field=ID 2>/dev/null | head -1)
+  if [ -n "$pid" ] && [ -n "$cat_serum" ]; then
+    $WP post term set "$pid" product_cat "$cat_serum" 2>/dev/null || true
+  fi
+  pid=$($WP post list --post_type=product --name=kem-duong-am --field=ID 2>/dev/null | head -1)
+  if [ -n "$pid" ] && [ -n "$cat_kem" ]; then
+    $WP post term set "$pid" product_cat "$cat_kem" 2>/dev/null || true
+  fi
 }
 
 create_beauty_product() {
@@ -285,6 +366,29 @@ finalize() {
   log "Admin: $URL/wp-admin (user: $ADMIN_USER)"
 }
 
+apply_brand_logo() {
+  local logo="/var/www/html/wp-content/themes/sos-beauty/assets/images/logo.jpg"
+  if [ ! -f "$logo" ]; then
+    log "Brand logo not found at $logo — skip."
+    return
+  fi
+
+  log "Applying brand logo + site icon..."
+  local existing
+  existing=$($WP post list --post_type=attachment --name=logo --field=ID 2>/dev/null | head -1)
+  local logo_id="$existing"
+  if [ -z "$logo_id" ]; then
+    logo_id=$($WP media import "$logo" --porcelain 2>/dev/null | head -1)
+  fi
+  if [ -n "$logo_id" ]; then
+    $WP theme mod set custom_logo "$logo_id"
+    $WP option update site_icon "$logo_id"
+    log "Custom logo + site icon set (attachment #$logo_id)."
+  else
+    log "Could not import logo — theme fallback image still used."
+  fi
+}
+
 main() {
   wait_for_wp
   install_wordpress
@@ -293,6 +397,7 @@ main() {
   create_pages
   create_menu
   create_demo_products
+  apply_brand_logo
   finalize
 }
 
