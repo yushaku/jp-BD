@@ -1322,6 +1322,204 @@ ul.products::after {
   border-color: var(--jp-matcha);
 }
 
+/* ─── Single Product — Beauty PDP ─── */
+.beauty-pdp {
+  --pdp-gap: 2.5rem;
+  margin: 0 auto;
+  max-width: var(--jp-container);
+  padding: var(--jp-space-lg) var(--jp-gutter);
+}
+
+.beauty-pdp__grid {
+  align-items: start;
+  display: grid;
+  gap: var(--pdp-gap);
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+}
+
+.beauty-pdp__gallery {
+  min-width: 0;
+}
+
+.beauty-pdp__summary {
+  min-width: 0;
+  position: sticky;
+  top: calc(var(--header-offset, 0px) + 1.5rem);
+}
+
+.beauty-pdp__brand {
+  color: var(--jp-gold);
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+}
+
+.beauty-pdp__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 0.75rem;
+}
+
+.beauty-pdp__price {
+  margin: 0 0 1rem;
+}
+
+.beauty-pdp__price .price {
+  color: var(--jp-primary);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.beauty-pdp__price .price del {
+  color: var(--jp-muted);
+  font-size: 1rem;
+  font-weight: 500;
+  margin-right: 0.5rem;
+}
+
+.beauty-pdp__price .price ins {
+  text-decoration: none;
+}
+
+.beauty-pdp__short-desc {
+  border-left: 3px solid var(--jp-primary);
+  color: var(--jp-muted);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  margin: 0 0 1.5rem;
+  padding-left: 1rem;
+}
+
+.beauty-pdp__atc {
+  margin: 0 0 1.5rem;
+}
+
+.beauty-pdp__atc form.cart {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.beauty-pdp__atc .quantity {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.beauty-pdp__atc .qty {
+  min-height: 44px;
+  text-align: center;
+  width: 4rem;
+}
+
+.beauty-pdp__atc .single_add_to_cart_button {
+  background: var(--jp-cta);
+  border: none;
+  border-radius: var(--jp-radius);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-height: 48px;
+  padding: 0.75rem 1.5rem;
+  transition: background var(--jp-duration) var(--jp-ease);
+  width: 100%;
+}
+
+.beauty-pdp__atc .single_add_to_cart_button:hover {
+  background: var(--jp-cta-hover);
+}
+
+.beauty-pdp__atc .single_add_to_cart_button.loading {
+  opacity: 0.7;
+}
+
+.beauty-pdp__trust {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1.25rem;
+  margin: 0 0 1.5rem;
+}
+
+.beauty-pdp__trust-item {
+  align-items: center;
+  color: var(--jp-muted);
+  display: inline-flex;
+  font-size: 0.8rem;
+  gap: 0.4rem;
+}
+
+.beauty-pdp__trust-icon {
+  color: var(--jp-primary);
+  flex-shrink: 0;
+  line-height: 0;
+}
+
+.beauty-pdp__trust-icon svg {
+  height: 18px;
+  width: 18px;
+}
+
+.beauty-pdp__meta {
+  border-top: 1px solid var(--jp-border);
+  color: var(--jp-muted);
+  font-size: 0.85rem;
+  padding-top: 1rem;
+}
+
+.beauty-pdp__meta a {
+  color: var(--jp-primary);
+  text-decoration: none;
+}
+
+.beauty-pdp__meta a:hover {
+  text-decoration: underline;
+}
+
+.beauty-pdp__tabs {
+  margin-top: 2.5rem;
+}
+
+.beauty-pdp__related {
+  border-top: 1px solid var(--jp-border);
+  margin-top: 3rem;
+  padding-top: 2rem;
+}
+
+.beauty-pdp__related-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem;
+}
+
+.beauty-pdp__related .woocommerce ul.products {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+@media (max-width: 768px) {
+  .beauty-pdp__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .beauty-pdp__summary {
+    position: static;
+  }
+
+  .beauty-pdp {
+    --pdp-gap: 1.5rem;
+    padding: var(--jp-space-md);
+  }
+}
+
 .beauty-shop-filters {
   display: flex;
   flex-wrap: wrap;
