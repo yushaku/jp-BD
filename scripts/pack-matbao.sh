@@ -44,29 +44,14 @@ pack_products() {
   python3 - "$src" "$dest" <<'PY'
 import shutil
 import sys
-import unicodedata
 from pathlib import Path
 
 src, dest = Path(sys.argv[1]), Path(sys.argv[2])
-needles = [
-    "pure beau", "serum kracie", "170g", "130g", "srm trà xanh", "srm tra xanh",
-    "posh kosh", "keana", "white serum", "meishoku", "sunbears", "skin aqua",
-    "tsubaki", "manis", "600ml", "white and white", "ora2", "nmn", "13000",
-    "genpi", "dhc",
-]
-
-def fold(s: str) -> str:
-    s = unicodedata.normalize("NFKC", s)
-    s = "".join(c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn")
-    return s.casefold()
 
 exts = {".jpg", ".jpeg", ".png", ".webp"}
 copied = 0
 for d in sorted(src.iterdir()):
     if not d.is_dir():
-        continue
-    name = fold(d.name)
-    if not any(n in name for n in needles):
         continue
     imgs = sorted(
         [p for p in d.iterdir() if p.is_file() and p.suffix.lower() in exts],
@@ -94,15 +79,19 @@ cat > "$STAGE/RUN.txt" << 'EOF'
 Mat Bao seed — CLI only
 =======================
 
+Plan chi tiết: docs/matbao-deploy-plan.md
+
 1. Plesk Files → upload matbao-seed.zip vào home (vd. ~/ )
+   Hoặc: scp dist/matbao-seed.zip <user>@s88d44.cloudnetwork.vn:~/
 
 2. SSH Terminal:
 
    source ~/.bashrc
    cd ~
-   unzip -o matbao-seed.zip -d matbao-seed
+   unzip -o matbao-seed.zip -d .
 
    # theme
+   mkdir -p ~/httpdocs/wp-content/themes/sos-beauty
    rsync -a matbao-seed/wp-content/themes/sos-beauty/ ~/httpdocs/wp-content/themes/sos-beauty/
 
    # scripts
@@ -110,29 +99,39 @@ Mat Bao seed — CLI only
    cp matbao-seed/seed-products-from-folder.sh ~/
    chmod +x ~/setup-matbao.sh ~/seed-products-from-folder.sh
 
-   # ảnh sản phẩm (nếu có trong zip)
+   # ảnh sản phẩm
    mkdir -p ~/products
-   rsync -a matbao-seed/products/ ~/products/ 2>/dev/null || true
+   rsync -a matbao-seed/products/ ~/products/
 
-3. Setup site (theme + Woo + menu + categories):
+3. Backup trước khi setup:
+
+   cd ~/httpdocs
+   wp db export ~/backup-pre-setup-$(date +%Y%m%d-%H%M).sql
+
+4. Setup site (theme + Woo + menu + categories + seed):
 
    cd ~/httpdocs
    bash ~/setup-matbao.sh
 
-4. Seed ~20 SP từ folder ảnh (idempotent — chạy lại an toàn):
+5. (Nếu cần) Seed lại products riêng:
 
    cd ~/httpdocs
    PRODUCTS_DIR=~/products bash ~/seed-products-from-folder.sh
 
-   # hoặc đặt products vào ~/httpdocs/products rồi:
-   # bash ~/seed-products-from-folder.sh
+6. Verify:
 
-5. Mở https://jpbuidang.vn — shop có sản phẩm + ảnh.
+   wp theme list --status=active     # → sos-beauty
+   wp post list --post_type=product --format=count   # → 43
+   wp option get woocommerce_currency                 # → VND
+
+7. Mở https://jpbuidang.vn — shop có 43 sản phẩm + ảnh.
 
 Ghi chú:
+- Cần PHP 8.2 (Plesk → PHP Settings).
 - Cần WooCommerce active (setup-matbao.sh làm giúp).
-- Re-run seed = bỏ qua slug/title đã có.
-- Full folder products/ (~700MB) không bắt buộc; zip chỉ kèm bản slim (~các SP seed).
+- Scripts idempotent: chạy lại bỏ qua slug/title đã có.
+- seed script tự scan mọi folder trong products/ (auto category + brand + giá).
+- Zip chỉ kèm ≤3 ảnh/SP (~60MB). Full products/ ~700MB không cần upload.
 EOF
 
 cd "$OUT"
