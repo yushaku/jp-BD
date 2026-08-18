@@ -57,6 +57,16 @@ PHASE 7: Backup
 
 ---
 
+## ⚡ Không có SSH? → Dùng Web Terminal
+
+SSH port 22/2222 của Mắt Bão **đang đóng** (đã test 2026-08-18).
+
+👉 **[Runbook Plesk Web Terminal](./matbao-deploy/web-terminal-runbook.md)** — 10 BLOCK copy-paste, không cần SSH.
+
+Muốn có SSH thật? Mở ticket tại `id.matbao.net` → Hỗ trợ, xin mở port 22 + whitelist IP.
+
+---
+
 ## 🛠️ Scripts liên quan
 
 | Script | Chạy ở đâu | Làm gì |
