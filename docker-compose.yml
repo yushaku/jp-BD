@@ -93,6 +93,7 @@ services:
     volumes:
       - wordpress_data:/var/www/html
       - ./scripts:/scripts
+      - ./products:/products:ro
       - ./wp-content/themes/sos-beauty:/var/www/html/wp-content/themes/sos-beauty
     user: "33:33"
     working_dir: /var/www/html

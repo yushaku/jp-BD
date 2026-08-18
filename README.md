@@ -123,12 +123,15 @@ Child theme nằm tại `wp-content/themes/sos-beauty/` (mount vào container).
 
 | File                                   | Vai trò                                            |
 | -------------------------------------- | -------------------------------------------------- |
-| `style.css`                            | Palette Washi & Matcha, font Lora + Be Vietnam Pro |
+| `assets/css/system.css`                | Design system: tokens + atoms `.jp-*`              |
+| `style.css`                            | Feature layout (header, promo, trust, Woo tweaks)  |
 | `front-page.php`                       | Promo grid, danh mục, sản phẩm, trust strip        |
 | `template-parts/promo-hero.php`        | Lưới ưu đãi (feature + countdown + 2 tile)         |
 | `functions.php`                        | Tab sản phẩm, Customizer, hooks WooCommerce        |
 | `woocommerce/content-product.php`      | Thẻ sản phẩm — thương hiệu trên archive            |
 | `woocommerce/single-product/title.php` | Hiển thị thương hiệu PDP                           |
+
+**Design system:** see [docs/design-system.md](docs/design-system.md). Atoms: `.jp-btn`, `.jp-card`, `.jp-section`, `.jp-badge`, `.jp-eyebrow`, `.jp-container`.
 
 **Palette:** `--jp-matcha` (accent), `--jp-matcha-text` / `--jp-gold` / `--jp-vermillion` (text+CTA, WCAG AA vs cream), `--jp-indigo` (footer bg). Text on footer: `--jp-footer-text` / `--jp-footer-muted` — no low-opacity body copy.
 
@@ -151,9 +154,12 @@ docker compose --profile cli run --rm --entrypoint wp wpcli --allow-root theme a
 ├── .env.example
 ├── wp-content/themes/sos-beauty/   # Child theme mỹ phẩm (commit được)
 │   ├── style.css
+│   ├── assets/css/system.css       # Design tokens + .jp-* atoms
 │   ├── functions.php
 │   ├── front-page.php
 │   └── woocommerce/
+├── docs/
+│   └── design-system.md            # Atom usage + token table
 ├── scripts/
 │   ├── setup.sh              # Khởi tạo WP + WooCommerce
 │   └── plugins/
