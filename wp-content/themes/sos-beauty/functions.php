@@ -1436,3 +1436,20 @@ function sos_beauty_handle_newsletter() {
 }
 add_action( 'admin_post_nopriv_sos_beauty_newsletter', 'sos_beauty_handle_newsletter' );
 add_action( 'admin_post_sos_beauty_newsletter', 'sos_beauty_handle_newsletter' );
+
+/**
+ * Estimate reading time in minutes.
+ *
+ * @param string $content Post content.
+ * @return int Minutes (minimum 1).
+ */
+function sos_beauty_estimate_reading_time( $content = '' ) {
+	if ( empty( $content ) ) {
+		$content = get_the_content();
+	}
+	$content  = strip_shortcodes( $content );
+	$content  = wp_strip_all_tags( $content );
+	$word_count = str_word_count( $content );
+	$minutes   = max( 1, floor( $word_count / 200 ) );
+	return (int) $minutes;
+}
