@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SOS_BEAUTY_VERSION', '1.6.3' );
+define( 'SOS_BEAUTY_VERSION', '1.11.13' );
 
 /**
  * Brand logo / favicon paths (theme assets).
@@ -69,22 +69,51 @@ function sos_beauty_custom_logo( $html ) {
 add_filter( 'get_custom_logo', 'sos_beauty_custom_logo' );
 
 /**
- * Hide Storefront header cart (price + item count in primary nav).
+ * Hathor-style 3-tier header: top utility | logo+search+care | centered nav.
  */
-function sos_beauty_remove_header_cart() {
+function sos_beauty_header_layout() {
+	remove_action( 'storefront_header', 'storefront_header_container', 0 );
+	remove_action( 'storefront_header', 'storefront_site_branding', 20 );
+	remove_action( 'storefront_header', 'storefront_secondary_navigation', 30 );
+	remove_action( 'storefront_header', 'storefront_product_search', 40 );
 	remove_action( 'storefront_header', 'storefront_header_cart', 60 );
+
+	add_action( 'storefront_header', 'sos_beauty_header_container_open', 0 );
+	add_action( 'storefront_header', 'sos_beauty_header_main_row', 20 );
 }
-add_action( 'init', 'sos_beauty_remove_header_cart' );
+add_action( 'init', 'sos_beauty_header_layout' );
 
 /**
- * Logo + primary menu on one header row (search removed).
+ * Open main header container (logo / search / care row).
  */
-function sos_beauty_header_one_line() {
-	remove_action( 'storefront_header', 'storefront_site_branding', 20 );
-	remove_action( 'storefront_header', 'storefront_product_search', 40 );
-	add_action( 'storefront_header', 'storefront_site_branding', 45 );
+function sos_beauty_header_container_open() {
+	echo '<div class="col-full beauty-header-main-wrap">';
 }
-add_action( 'init', 'sos_beauty_header_one_line' );
+
+/**
+ * Middle header row markup.
+ */
+function sos_beauty_header_main_row() {
+	get_template_part( 'template-parts/header-main' );
+}
+
+/**
+ * Product search form — VN placeholder + icon submit.
+ */
+function sos_beauty_product_search_form( $form ) {
+	$placeholder = esc_attr__( 'Nhập tên sản phẩm, danh mục...', 'sos-beauty' );
+	$form        = preg_replace( '/placeholder="[^"]*"/', 'placeholder="' . $placeholder . '"', $form, 1 );
+
+	$button = '<button type="submit" class="beauty-header-search__submit" aria-label="' . esc_attr__( 'Tìm kiếm', 'sos-beauty' ) . '">'
+		. '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>'
+		. '</button>';
+
+	$form = preg_replace( '/<button[^>]*>.*?<\/button>/s', $button, $form, 1 );
+	$form = preg_replace( '/<input[^>]+type=["\']submit["\'][^>]*>/i', $button, $form, 1 );
+
+	return $form;
+}
+add_filter( 'get_product_search_form', 'sos_beauty_product_search_form' );
 
 /**
  * Disable wp_page_menu fallback for handheld nav (prevents duplicate page list).
@@ -115,9 +144,15 @@ function sos_beauty_enqueue_styles() {
 		null
 	);
 	wp_enqueue_style(
+		'sos-beauty-system',
+		get_stylesheet_directory_uri() . '/assets/css/system.css',
+		array( $parent, 'sos-beauty-fonts' ),
+		SOS_BEAUTY_VERSION
+	);
+	wp_enqueue_style(
 		'sos-beauty-style',
 		get_stylesheet_uri(),
-		array( $parent, 'sos-beauty-fonts' ),
+		array( 'sos-beauty-system' ),
 		SOS_BEAUTY_VERSION
 	);
 }
@@ -153,20 +188,20 @@ function sos_beauty_enqueue_scripts() {
 		true
 	);
 
-	if ( is_front_page() ) {
+	if ( is_product() ) {
 		wp_enqueue_script(
-			'sos-beauty-promo-countdown',
-			$uri . '/assets/js/promo-countdown.js',
+			'sos-beauty-sticky-atc',
+			$uri . '/assets/js/sticky-atc.js',
 			array(),
 			SOS_BEAUTY_VERSION,
 			true
 		);
 	}
 
-	if ( is_product() ) {
+	if ( function_exists( 'is_shop' ) && ( is_shop() || is_product_taxonomy() ) ) {
 		wp_enqueue_script(
-			'sos-beauty-sticky-atc',
-			$uri . '/assets/js/sticky-atc.js',
+			'sos-beauty-page-jumper',
+			$uri . '/assets/js/page-jumper.js',
 			array(),
 			SOS_BEAUTY_VERSION,
 			true
@@ -536,6 +571,42 @@ function sos_beauty_promo_customize( $wp_customize ) {
 			)
 		);
 	}
+
+	$wp_customize->add_section(
+		'sos_beauty_home_categories',
+		array(
+			'title'    => __( 'JP Bùi Đặng Danh mục trang chủ', 'sos-beauty' ),
+			'priority' => 32,
+		)
+	);
+
+	$category_images = array(
+		'beauty'     => 'Danh mục Mỹ phẩm — ảnh nền',
+		'supplement' => 'Danh mục Hàng tiêu dùng — ảnh nền',
+		'food'       => 'Danh mục Thực phẩm — ảnh nền',
+	);
+
+	foreach ( $category_images as $key => $label ) {
+		$setting = 'sos_beauty_category_' . $key . '_image';
+		$wp_customize->add_setting(
+			$setting,
+			array(
+				'default'           => 0,
+				'sanitize_callback' => 'absint',
+			)
+		);
+		$wp_customize->add_control(
+			new WP_Customize_Media_Control(
+				$wp_customize,
+				$setting,
+				array(
+					'label'     => $label,
+					'section'   => 'sos_beauty_home_categories',
+					'mime_type' => 'image',
+				)
+			)
+		);
+	}
 }
 add_action( 'customize_register', 'sos_beauty_promo_customize' );
 
@@ -578,6 +649,24 @@ function sos_beauty_promo_image_url( $attachment_id ) {
 }
 
 /**
+ * Theme-image fallback for home promotional and category tiles.
+ * A Customizer media selection always overrides this bundled temporary image.
+ */
+function sos_beauty_home_image_url( $theme_mod, $fallback_file ) {
+	$image = sos_beauty_promo_image_url( get_theme_mod( $theme_mod, 0 ) );
+	if ( $image ) {
+		return $image;
+	}
+
+	$path = get_stylesheet_directory() . '/assets/images/' . $fallback_file;
+	if ( file_exists( $path ) ) {
+		return get_stylesheet_directory_uri() . '/assets/images/' . $fallback_file;
+	}
+
+	return '';
+}
+
+/**
  * Sale badge shows percentage when possible.
  */
 function sos_beauty_sale_flash( $html, $post, $product ) {
@@ -598,7 +687,7 @@ add_filter( 'woocommerce_sale_flash', 'sos_beauty_sale_flash', 10, 3 );
  * Loop add-to-cart button: cart icon with accessible label.
  */
 function sos_beauty_loop_atc_icon( $html, $product, $args ) {
-	$icon = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1.5"/><circle cx="19" cy="21" r="1.5"/><path d="M2.5 3h2l2.6 12.4a1.5 1.5 0 0 0 1.5 1.1h9.9a1.5 1.5 0 0 0 1.5-1.2L21.5 8H6"/></svg>';
+	$icon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>';
 
 	$attributes = isset( $args['attributes'] ) ? $args['attributes'] : array();
 	if ( empty( $attributes['aria-label'] ) ) {
@@ -606,11 +695,14 @@ function sos_beauty_loop_atc_icon( $html, $product, $args ) {
 	}
 	$attributes['title'] = $product->add_to_cart_text();
 
+	$class = isset( $args['class'] ) ? $args['class'] : 'button';
+	$class = trim( $class . ' beauty-card__cta' );
+
 	return sprintf(
 		'<a href="%s" data-quantity="%s" class="%s" %s>%s</a>',
 		esc_url( $product->add_to_cart_url() ),
 		esc_attr( isset( $args['quantity'] ) ? $args['quantity'] : 1 ),
-		esc_attr( isset( $args['class'] ) ? $args['class'] : 'button' ),
+		esc_attr( $class ),
 		wc_implode_html_attributes( $attributes ),
 		$icon
 	);
@@ -676,9 +768,279 @@ function sos_beauty_shop_filters() {
 	}
 	echo '</nav>';
 }
-add_action( 'woocommerce_archive_description', 'sos_beauty_shop_filters', 25 );
-add_action( 'woocommerce_before_shop_loop', 'sos_beauty_shop_filters', 15 );
-add_action( 'woocommerce_no_products_found', 'sos_beauty_shop_filters', 5 );
+
+/**
+ * Drop archive title + chip filters (nav lives in sidebar).
+ */
+function sos_beauty_remove_shop_header() {
+	add_filter( 'woocommerce_show_page_title', '__return_false' );
+	remove_action( 'woocommerce_archive_description', 'woocommerce_taxonomy_archive_description', 10 );
+	remove_action( 'woocommerce_archive_description', 'woocommerce_product_archive_description', 10 );
+}
+add_action( 'wp', 'sos_beauty_remove_shop_header' );
+
+/**
+ * Shop / product archives get the category sidebar.
+ */
+function sos_beauty_show_shop_sidebar() {
+	if ( ! function_exists( 'is_woocommerce' ) ) {
+		return false;
+	}
+	return is_shop() || is_product_taxonomy() || is_product();
+}
+
+/**
+ * Full-width layout when category sidebar is off.
+ *
+ * @param string[] $classes Body classes.
+ * @return string[]
+ */
+function sos_beauty_sidebar_body_class( $classes ) {
+	if ( sos_beauty_show_shop_sidebar() ) {
+		$classes = array_values( array_diff( $classes, array( 'storefront-full-width-content', 'left-sidebar' ) ) );
+		if ( ! in_array( 'right-sidebar', $classes, true ) ) {
+			$classes[] = 'right-sidebar';
+		}
+		return $classes;
+	}
+	$classes[] = 'sos-beauty-no-sidebar';
+	return $classes;
+}
+add_filter( 'body_class', 'sos_beauty_sidebar_body_class', 20 );
+
+/**
+ * Skip Uncategorized and stray numeric terms (bad imports).
+ *
+ * @param WP_Term $term Product cat.
+ * @return bool
+ */
+function sos_beauty_cat_is_junk( $term ) {
+	if ( 'uncategorized' === $term->slug ) {
+		return true;
+	}
+	return (bool) preg_match( '/^\d+$/', $term->slug );
+}
+
+/**
+ * Nested product_cat tree, junk roots stripped.
+ *
+ * @return WP_Term[]
+ */
+function sos_beauty_category_tree() {
+	$terms = get_terms(
+		array(
+			'taxonomy'   => 'product_cat',
+			'hide_empty' => false,
+			'orderby'    => 'menu_order',
+			'order'      => 'ASC',
+		)
+	);
+	if ( is_wp_error( $terms ) || empty( $terms ) ) {
+		return array();
+	}
+
+	$by_parent = array();
+	foreach ( $terms as $term ) {
+		if ( 0 === (int) $term->parent && sos_beauty_cat_is_junk( $term ) ) {
+			continue;
+		}
+		$by_parent[ (int) $term->parent ][] = $term;
+	}
+
+	$build = function ( $parent_id ) use ( &$build, $by_parent ) {
+		$out = array();
+		if ( empty( $by_parent[ $parent_id ] ) ) {
+			return $out;
+		}
+		foreach ( $by_parent[ $parent_id ] as $term ) {
+			$term->children = $build( (int) $term->term_id );
+			$out[]          = $term;
+		}
+		return $out;
+	};
+
+	$tree = $build( 0 );
+
+	$root_order = array(
+		'my-pham-nhat'    => 1,
+		'hang-tieu-dung'  => 2,
+		'thuc-pham-nhat'  => 3,
+	);
+	usort(
+		$tree,
+		function ( $a, $b ) use ( $root_order ) {
+			$aa = isset( $root_order[ $a->slug ] ) ? $root_order[ $a->slug ] : 50;
+			$bb = isset( $root_order[ $b->slug ] ) ? $root_order[ $b->slug ] : 50;
+			if ( $aa === $bb ) {
+				return strcasecmp( $a->name, $b->name );
+			}
+			return $aa - $bb;
+		}
+	);
+
+	// Promote mid-groups (Chăm sóc da, …) so tree matches 2-level sidebar UI.
+	$roots = array();
+	foreach ( $tree as $term ) {
+		$has_grandchildren = false;
+		if ( ! empty( $term->children ) ) {
+			foreach ( $term->children as $child ) {
+				if ( ! empty( $child->children ) ) {
+					$has_grandchildren = true;
+					break;
+				}
+			}
+		}
+		if ( $has_grandchildren ) {
+			foreach ( $term->children as $child ) {
+				$roots[] = $child;
+			}
+		} else {
+			$roots[] = $term;
+		}
+	}
+
+	return $roots;
+}
+
+/**
+ * Current product_cat id (archive or first cat on PDP).
+ *
+ * @return int
+ */
+function sos_beauty_current_cat_id() {
+	if ( is_product_category() ) {
+		$obj = get_queried_object();
+		return ( $obj && ! empty( $obj->term_id ) ) ? (int) $obj->term_id : 0;
+	}
+	if ( is_product() ) {
+		$ids = wc_get_product_term_ids( get_the_ID(), 'product_cat' );
+		return $ids ? (int) $ids[0] : 0;
+	}
+	return 0;
+}
+
+/**
+ * One row in the category tree.
+ *
+ * @param WP_Term $term       Node.
+ * @param int     $current_id Active term id.
+ * @param int     $depth      Nest level.
+ */
+function sos_beauty_category_nav_item( $term, $current_id, $depth ) {
+	$has_children = ! empty( $term->children );
+	$active       = $current_id && (int) $term->term_id === (int) $current_id;
+	$class        = 'beauty-catnav__item beauty-catnav__item--d' . (int) $depth;
+	if ( $has_children ) {
+		$class .= ' beauty-catnav__item--parent';
+	}
+	if ( $active ) {
+		$class .= ' is-active';
+	}
+
+	echo '<li class="' . esc_attr( $class ) . '">';
+	printf(
+		'<a class="beauty-catnav__link%s" href="%s">%s</a>',
+		$active ? ' is-active' : '',
+		esc_url( get_term_link( $term ) ),
+		esc_html( $term->name )
+	);
+	if ( $has_children ) {
+		echo '<ul class="beauty-catnav__children">';
+		foreach ( $term->children as $child ) {
+			sos_beauty_category_nav_item( $child, $current_id, $depth + 1 );
+		}
+		echo '</ul>';
+	}
+	echo '</li>';
+}
+
+/**
+ * Sidebar product category nav.
+ */
+function sos_beauty_category_nav() {
+	$tree = sos_beauty_category_tree();
+	if ( empty( $tree ) ) {
+		return;
+	}
+
+	$current_id = sos_beauty_current_cat_id();
+	$shop_url   = wc_get_page_permalink( 'shop' );
+
+	echo '<nav class="beauty-catnav" aria-label="' . esc_attr__( 'Danh mục sản phẩm', 'sos-beauty' ) . '">';
+	echo '<p class="beauty-catnav__title">' . esc_html__( 'Danh mục', 'sos-beauty' ) . '</p>';
+	printf(
+		'<a class="beauty-catnav__section%s" href="%s">%s</a>',
+		is_shop() ? ' is-active' : '',
+		esc_url( $shop_url ),
+		esc_html__( 'Sản phẩm', 'sos-beauty' )
+	);
+	echo '<ul class="beauty-catnav__list">';
+	foreach ( $tree as $term ) {
+		sos_beauty_category_nav_item( $term, $current_id, 0 );
+	}
+	echo '</ul>';
+	echo '</nav>';
+}
+
+/**
+ * Catalog pagination — icon-only chevrons (bar matches reference card UI).
+ */
+function sos_beauty_pagination_chevron( $direction ) {
+	$points = 'prev' === $direction ? '15 18 9 12 15 6' : '9 18 15 12 9 6';
+	return '<svg class="beauty-page-nav__svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="' . $points . '"/></svg>';
+}
+
+function sos_beauty_pagination_args( $args ) {
+	$args['prev_text'] = sos_beauty_pagination_chevron( 'prev' ) . '<span class="screen-reader-text">' . esc_html__( 'Trang trước', 'sos-beauty' ) . '</span>';
+	$args['next_text'] = sos_beauty_pagination_chevron( 'next' ) . '<span class="screen-reader-text">' . esc_html__( 'Trang sau', 'sos-beauty' ) . '</span>';
+	return $args;
+}
+add_filter( 'woocommerce_pagination_args', 'sos_beauty_pagination_args' );
+
+/**
+ * Page jumper — "Trang [n] của N" on the right of the pagination card.
+ */
+function sos_beauty_page_jumper() {
+	$total   = (int) wc_get_loop_prop( 'total_pages' );
+	$current = max( 1, (int) wc_get_loop_prop( 'current_page' ) );
+	if ( $total < 2 ) {
+		return;
+	}
+
+	echo '<div class="beauty-page-jumper">';
+	echo '<span class="beauty-page-jumper__text">' . esc_html__( 'Trang', 'sos-beauty' ) . '</span>';
+	echo '<label class="screen-reader-text" for="beauty-page-jump">' . esc_html__( 'Chọn trang', 'sos-beauty' ) . '</label>';
+	echo '<select id="beauty-page-jump" class="beauty-page-jumper__select">';
+	for ( $i = 1; $i <= $total; $i++ ) {
+		printf(
+			'<option value="%s"%s>%d</option>',
+			esc_url( get_pagenum_link( $i, false ) ),
+			selected( $current, $i, false ),
+			$i
+		);
+	}
+	echo '</select>';
+	echo '<span class="beauty-page-jumper__text">' . esc_html( sprintf( __( 'của %d', 'sos-beauty' ), $total ) ) . '</span>';
+	echo '</div>';
+}
+
+/**
+ * Catalog bar: pagination card only (no sort dropdown, no result count).
+ */
+function sos_beauty_remove_top_shop_sorting() {
+	remove_action( 'woocommerce_before_shop_loop', 'storefront_sorting_wrapper', 9 );
+	remove_action( 'woocommerce_before_shop_loop', 'woocommerce_catalog_ordering', 10 );
+	remove_action( 'woocommerce_before_shop_loop', 'woocommerce_result_count', 20 );
+	remove_action( 'woocommerce_before_shop_loop', 'storefront_woocommerce_pagination', 30 );
+	remove_action( 'woocommerce_before_shop_loop', 'storefront_sorting_wrapper_close', 31 );
+
+	remove_action( 'woocommerce_after_shop_loop', 'woocommerce_catalog_ordering', 10 );
+	remove_action( 'woocommerce_after_shop_loop', 'woocommerce_result_count', 20 );
+	remove_action( 'woocommerce_after_shop_loop', 'storefront_sorting_wrapper_close', 31 );
+	add_action( 'woocommerce_after_shop_loop', 'sos_beauty_page_jumper', 31 );
+	add_action( 'woocommerce_after_shop_loop', 'storefront_sorting_wrapper_close', 32 );
+}
+add_action( 'wp', 'sos_beauty_remove_top_shop_sorting' );
 
 /**
  * Prevent double-render when multiple WC archive hooks fire.
@@ -892,10 +1254,10 @@ function sos_beauty_render_float_contact() {
 add_action( 'wp_footer', 'sos_beauty_render_float_contact', 20 );
 
 /**
- * Contact page: drop Storefront breadcrumb (custom layout has own hierarchy).
+ * Static pages (Liên hệ, Giới thiệu): drop Storefront breadcrumb.
  */
 function sos_beauty_contact_page_cleanup() {
-	if ( ! is_page( 'lien-he' ) ) {
+	if ( ! is_page( array( 'lien-he', 'gioi-thieu' ) ) ) {
 		return;
 	}
 	remove_action( 'storefront_before_content', 'woocommerce_breadcrumb', 10 );
@@ -904,15 +1266,79 @@ function sos_beauty_contact_page_cleanup() {
 add_action( 'wp', 'sos_beauty_contact_page_cleanup' );
 
 /**
+ * Breadcrumb delimiter — clear slash separators.
+ */
+function sos_beauty_breadcrumb_defaults( $defaults ) {
+	$defaults['delimiter'] = '<span class="breadcrumb-separator" aria-hidden="true">/</span>';
+	return $defaults;
+}
+add_filter( 'woocommerce_breadcrumb_defaults', 'sos_beauty_breadcrumb_defaults', 99 );
+
+/**
  * Body class for contact page styling hooks.
  */
 function sos_beauty_contact_body_class( $classes ) {
 	if ( is_page( 'lien-he' ) ) {
 		$classes[] = 'beauty-page-contact';
 	}
+	if ( is_page( 'gioi-thieu' ) ) {
+		$classes[] = 'beauty-page-about';
+	}
+	if ( is_home() || is_category() || is_tag() || is_author() || is_date() ) {
+		$classes[] = 'beauty-page-news';
+	}
 	return $classes;
 }
 add_filter( 'body_class', 'sos_beauty_contact_body_class' );
+
+/**
+ * Blog list: page title + card grid wrap (paging stays outside the grid).
+ */
+function sos_beauty_is_news_list() {
+	return is_home() || is_category() || is_tag() || is_author() || is_date();
+}
+
+function sos_beauty_news_header() {
+	if ( ! is_home() ) {
+		return;
+	}
+	$page_id = (int) get_option( 'page_for_posts' );
+	$title   = $page_id ? get_the_title( $page_id ) : __( 'Tin tức', 'sos-beauty' );
+	echo '<header class="beauty-news-header">';
+	echo '<h1 class="beauty-news-header__title">' . esc_html( $title ) . '</h1>';
+	echo '<p class="beauty-news-header__lead">' . esc_html__( 'Mỹ phẩm, TPCN và thực phẩm Nhật — chọn đúng, dùng đúng.', 'sos-beauty' ) . '</p>';
+	echo '</header>';
+}
+add_action( 'storefront_loop_before', 'sos_beauty_news_header', 10 );
+
+function sos_beauty_news_grid_open() {
+	if ( ! sos_beauty_is_news_list() ) {
+		return;
+	}
+	echo '<div class="beauty-news-grid">';
+}
+add_action( 'storefront_loop_before', 'sos_beauty_news_grid_open', 20 );
+
+function sos_beauty_news_grid_close() {
+	if ( ! sos_beauty_is_news_list() ) {
+		return;
+	}
+	echo '</div>';
+}
+add_action( 'storefront_loop_after', 'sos_beauty_news_grid_close', 5 );
+
+function sos_beauty_news_excerpt_length( $length ) {
+	if ( sos_beauty_is_news_list() ) {
+		return 28;
+	}
+	return $length;
+}
+add_filter( 'excerpt_length', 'sos_beauty_news_excerpt_length', 20 );
+
+function sos_beauty_news_excerpt_more() {
+	return '…';
+}
+add_filter( 'excerpt_more', 'sos_beauty_news_excerpt_more' );
 
 /**
  * Replace default Storefront footer widgets with structured site footer.

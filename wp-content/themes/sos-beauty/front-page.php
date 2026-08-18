@@ -18,6 +18,7 @@ $categories = array(
 		'label' => 'Mỹ phẩm',
 		'desc'  => 'Skincare, tóc, body',
 		'class' => 'beauty-categories__item--beauty',
+		'image' => sos_beauty_home_image_url( 'sos_beauty_category_beauty_image', 'category-collection.jpg' ),
 	),
 	array(
 		'slug'  => 'hang-tieu-dung',
@@ -25,6 +26,7 @@ $categories = array(
 		'label' => 'Hàng tiêu dùng',
 		'desc'  => 'TPCN & daily care',
 		'class' => 'beauty-categories__item--supplement',
+		'image' => sos_beauty_home_image_url( 'sos_beauty_category_supplement_image', 'category-collagen.jpg' ),
 	),
 	array(
 		'slug'  => 'thuc-pham-nhat',
@@ -32,6 +34,7 @@ $categories = array(
 		'label' => 'Thực phẩm',
 		'desc'  => 'Matcha, miso, snack',
 		'class' => 'beauty-categories__item--food',
+		'image' => sos_beauty_home_image_url( 'sos_beauty_category_food_image', 'promo-drinks.jpg' ),
 	),
 );
 
@@ -107,10 +110,12 @@ $trust_items = array(
 <nav class="beauty-categories" aria-label="<? esc_attr_e( 'Danh mục sản phẩm', 'sos-beauty' ); ?>">
 	<?php foreach ( $categories as $cat ) : ?>
 		<a class="beauty-categories__item <?php echo esc_attr( $cat['class'] ); ?>" href="<?php echo esc_url( sos_beauty_category_link( $cat['slug'] ) ); ?>">
-			<span class="beauty-categories__bg" aria-hidden="true"></span>
+			<span class="beauty-categories__bg" aria-hidden="true"<?php echo $cat['image'] ? ' style="background-image:url(' . esc_url( $cat['image'] ) . ')"' : ''; ?>></span>
 			<span class="beauty-categories__kanji" aria-hidden="true"><?php echo esc_html( $cat['kanji'] ); ?></span>
-			<span class="beauty-categories__label"><?php echo esc_html( $cat['label'] ); ?></span>
-			<span class="beauty-categories__desc"><?php echo esc_html( $cat['desc'] ); ?></span>
+			<span class="beauty-categories__content">
+				<span class="beauty-categories__label"><?php echo esc_html( $cat['label'] ); ?></span>
+				<span class="beauty-categories__desc"><?php echo esc_html( $cat['desc'] ); ?></span>
+			</span>
 		</a>
 	<?php endforeach; ?>
 </nav>
@@ -151,16 +156,6 @@ $trust_items = array(
 		<?php endforeach; ?>
 	</ul>
 </section>
-
-<aside class="beauty-disclaimer" role="note" aria-label="<?php esc_attr_e( 'Lưu ý thực phẩm chức năng', 'sos-beauty' ); ?>">
-	<span class="beauty-disclaimer__icon" aria-hidden="true">
-		<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5"/><circle cx="12" cy="16" r="0.9" fill="currentColor" stroke="none"/></svg>
-	</span>
-	<div class="beauty-disclaimer__body">
-		<strong class="beauty-disclaimer__label"><?php esc_html_e( 'Lưu ý TPCN', 'sos-beauty' ); ?></strong>
-		<p class="beauty-disclaimer__text"><?php esc_html_e( 'Thực phẩm chức năng không phải là thuốc, không có tác dụng thay thế thuốc chữa bệnh. Đọc kỹ hướng dẫn trước khi sử dụng.', 'sos-beauty' ); ?></p>
-	</div>
-</aside>
 
 <?php
 get_footer();
