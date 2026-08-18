@@ -1,6 +1,8 @@
 <?php
 /**
  * Single product title — show brand line for cosmetics.
+ *
+ * @package sos-beauty
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -14,7 +16,7 @@ if ( ! $brand ) {
 ?>
 
 <?php if ( $brand ) : ?>
-	<p class="beauty-product-brand"><?php echo esc_html( $brand ); ?></p>
+	<span class="beauty-pdp__brand"><?php echo esc_html( $brand ); ?></span>
 <?php endif; ?>
 
-<h1 class="product_title entry-title"><?php the_title(); ?></h1>
+<h1 class="beauty-pdp__title"><?php the_title(); ?></h1>

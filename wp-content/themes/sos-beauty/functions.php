@@ -1132,6 +1132,54 @@ function sos_beauty_pdp_trust() {
 add_action( 'woocommerce_after_add_to_cart_button', 'sos_beauty_pdp_trust' );
 
 /**
+ * Beauty PDP: trust badges row below ATC.
+ */
+function sos_beauty_pdp_trust_badges() {
+	$badges = array(
+		array(
+			'icon'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
+			'label' => __( 'Giao 2–3 ngày', 'sos-beauty' ),
+		),
+		array(
+			'icon'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+			'label' => __( 'Chính hãng 100%', 'sos-beauty' ),
+		),
+		array(
+			'icon'  => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>',
+			'label' => __( 'Đổi trả 7 ngày', 'sos-beauty' ),
+		),
+	);
+	?>
+	<div class="beauty-pdp__trust">
+		<?php foreach ( $badges as $badge ) : ?>
+			<span class="beauty-pdp__trust-item">
+				<span class="beauty-pdp__trust-icon" aria-hidden="true"><?php echo $badge['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- static SVG ?></span>
+				<?php echo esc_html( $badge['label'] ); ?>
+			</span>
+		<?php endforeach; ?>
+	</div>
+	<?php
+}
+add_action( 'woocommerce_after_add_to_cart_button', 'sos_beauty_pdp_trust_badges', 15 );
+
+/**
+ * Remove default Storefront single product wrappers — our template handles layout.
+ */
+function sos_beauty_pdp_template_setup() {
+	if ( ! is_product() ) {
+		return;
+	}
+
+	// Remove Storefront's default single product hooks.
+	remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10 );
+	remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+
+	// Move sale flash into summary.
+	add_action( 'woocommerce_single_product_summary', 'woocommerce_show_product_sale_flash', 4 );
+}
+add_action( 'wp', 'sos_beauty_pdp_template_setup' );
+
+/**
  * Free-shipping progress bar in cart.
  */
 function sos_beauty_free_shipping_minimum() {
