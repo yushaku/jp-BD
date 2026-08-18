@@ -179,6 +179,17 @@ create_pages() {
       --porcelain)
   fi
 
+  local blog_id
+  blog_id=$($WP post list --post_type=page --name=tin-tuc --field=ID 2>/dev/null | head -1)
+  if [ -z "$blog_id" ]; then
+    blog_id=$($WP post create --post_type=page \
+      --post_title='Tin tức' \
+      --post_name=tin-tuc \
+      --post_status=publish \
+      --porcelain)
+  fi
+  $WP option update page_for_posts "$blog_id" >/dev/null
+
   local shop_id cart_id checkout_id account_id front_id
   shop_id=$($WP option get woocommerce_shop_page_id 2>/dev/null || echo "")
   cart_id=$($WP option get woocommerce_cart_page_id 2>/dev/null || echo "")
@@ -220,11 +231,12 @@ create_menu() {
     log "Cleared existing menu items."
   fi
 
-  local front_id shop_id about_id contact_id cat_food cat_beauty cat_goods
+  local front_id shop_id about_id contact_id blog_id cat_food cat_beauty cat_goods
   front_id=$($WP option get page_on_front 2>/dev/null || echo "")
   shop_id=$($WP option get woocommerce_shop_page_id 2>/dev/null || echo "")
   about_id=$($WP post list --post_type=page --name=gioi-thieu --field=ID 2>/dev/null | head -1)
   contact_id=$($WP post list --post_type=page --name=lien-he --field=ID 2>/dev/null | head -1)
+  blog_id=$($WP post list --post_type=page --name=tin-tuc --field=ID 2>/dev/null | head -1)
   cat_beauty=$($WP term list product_cat --slug=my-pham-nhat --field=term_id 2>/dev/null | head -1)
   cat_goods=$($WP term list product_cat --slug=hang-tieu-dung --field=term_id 2>/dev/null | head -1)
   cat_food=$($WP term list product_cat --slug=thuc-pham-nhat --field=term_id 2>/dev/null | head -1)
@@ -235,6 +247,7 @@ create_menu() {
   [ -n "$cat_goods" ] && $WP menu item add-term "$menu_id" product_cat "$cat_goods" 2>/dev/null || true
   [ -n "$cat_food" ] && $WP menu item add-term "$menu_id" product_cat "$cat_food" 2>/dev/null || true
   [ -n "$about_id" ] && $WP menu item add-post "$menu_id" "$about_id" 2>/dev/null || true
+  [ -n "$blog_id" ] && $WP menu item add-post "$menu_id" "$blog_id" --title='Tin tức' 2>/dev/null || true
   [ -n "$contact_id" ] && $WP menu item add-post "$menu_id" "$contact_id" 2>/dev/null || true
 
   $WP menu location assign "$menu_id" primary 2>/dev/null || true
