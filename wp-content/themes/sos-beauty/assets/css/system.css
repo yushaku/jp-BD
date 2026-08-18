@@ -1,0 +1,480 @@
+/**
+ * JP Bùi Đặng — design system (Ultra Minimal)
+ * One brand color + neutrals. Primary: rgb(35, 45, 108) = #232D6C
+ */
+
+:root {
+  /* Core — 1 brand + neutrals */
+  --jp-primary: #232d6c;
+  --jp-primary-hover: #1a2254;
+  --jp-ink: #111827;
+  --jp-muted: #6b7280;
+  --jp-border: #e5e7eb;
+  --jp-paper: #f9fafb;
+  --jp-cream: #ffffff;
+  --jp-surface: #ffffff;
+  --jp-surface-elevated: #ffffff;
+  /* Derived / legacy aliases → same minimal set */
+  --jp-primary-soft: var(--jp-primary);
+  --jp-secondary: var(--jp-muted);
+  --jp-indigo: var(--jp-primary);
+  --jp-matcha: var(--jp-primary);
+  --jp-matcha-text: var(--jp-primary);
+  --jp-sakura: var(--jp-paper);
+  --jp-gold: var(--jp-muted);
+  --jp-gold-soft: var(--jp-muted);
+  --jp-vermillion: var(--jp-primary);
+  --jp-vermillion-soft: var(--jp-primary);
+  --jp-cta: var(--jp-primary);
+  --jp-cta-hover: var(--jp-primary-hover);
+  --jp-footer-text: #f9fafb;
+  --jp-footer-muted: #d1d5db;
+  --jp-radius: 8px;
+  --jp-radius-lg: 16px;
+  --jp-radius-card: var(--jp-radius-lg);
+  --jp-shadow: 0 1px 2px rgba(17, 24, 39, 0.06);
+  --jp-shadow-hover: 0 4px 16px rgba(17, 24, 39, 0.1);
+  --jp-space-xs: 0.25rem;
+  --jp-space-sm: 0.5rem;
+  --jp-space-md: 1rem;
+  --jp-space-lg: 1.5rem;
+  --jp-space-xl: 3rem;
+  --jp-container: 72rem;
+  --jp-gutter: 1.5rem;
+  --jp-btn-h: 44px;
+  --jp-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --jp-duration: 200ms;
+  --jp-focus-ring: 0 0 0 3px rgba(35, 45, 108, 0.28);
+  --font-display: "Lora", Georgia, serif;
+  --font-body: "Be Vietnam Pro", system-ui, sans-serif;
+}
+
+/* —— Container —— */
+.jp-container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: var(--jp-container);
+  padding-left: var(--jp-gutter);
+  padding-right: var(--jp-gutter);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Site-wide Storefront container — same width as header */
+.col-full {
+  box-sizing: border-box !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  max-width: var(--jp-container) !important;
+  padding-left: var(--jp-gutter) !important;
+  padding-right: var(--jp-gutter) !important;
+  width: 100%;
+}
+
+/* —— Eyebrow —— */
+.jp-eyebrow,
+.beauty-section__eyebrow {
+  color: var(--jp-gold);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  margin: 0 0 0.35rem;
+  text-transform: uppercase;
+}
+
+/* —— Button —— */
+.jp-btn {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--jp-radius);
+  box-sizing: border-box;
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 600;
+  gap: 0.4rem;
+  justify-content: center;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  min-height: var(--jp-btn-h);
+  padding: 0.5rem 1.25rem;
+  text-decoration: none;
+  transition:
+    background var(--jp-duration) var(--jp-ease),
+    color var(--jp-duration) var(--jp-ease),
+    border-color var(--jp-duration) var(--jp-ease),
+    transform var(--jp-duration) var(--jp-ease),
+    box-shadow var(--jp-duration) var(--jp-ease);
+  white-space: nowrap;
+}
+
+.jp-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--jp-focus-ring);
+}
+
+.jp-btn--primary {
+  background: var(--jp-cta);
+  border-color: var(--jp-cta);
+  color: #fff;
+}
+
+.jp-btn--primary:hover {
+  background: var(--jp-cta-hover);
+  border-color: var(--jp-cta-hover);
+  color: #fff;
+}
+
+.jp-btn--ghost,
+.beauty-section__more {
+  align-items: center;
+  background: var(--jp-cream);
+  border: 1px solid var(--jp-border);
+  border-radius: 999px;
+  color: var(--jp-ink);
+  display: inline-flex;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  min-height: var(--jp-btn-h);
+  padding: 0.5rem 1.25rem;
+  text-decoration: none;
+  transition:
+    background var(--jp-duration) var(--jp-ease),
+    color var(--jp-duration) var(--jp-ease),
+    border-color var(--jp-duration) var(--jp-ease);
+  white-space: nowrap;
+}
+
+.jp-btn--ghost:hover,
+.beauty-section__more:hover {
+  background: var(--jp-section-promo, var(--jp-indigo));
+  border-color: transparent;
+  color: #fff;
+}
+
+.jp-btn--icon,
+.woocommerce ul.products li.product .button,
+.woocommerce ul.products li.product .beauty-card__cta {
+  align-items: center;
+  align-self: flex-end;
+  background: var(--jp-paper);
+  border: none;
+  border-radius: 50%;
+  box-shadow: none;
+  color: var(--jp-ink);
+  cursor: pointer;
+  display: inline-flex;
+  flex-shrink: 0;
+  height: 48px;
+  justify-content: center;
+  margin: 0;
+  min-height: 48px;
+  padding: 0;
+  transition:
+    background var(--jp-duration) var(--jp-ease),
+    color var(--jp-duration) var(--jp-ease);
+  width: 48px;
+}
+
+.jp-btn--icon svg,
+.woocommerce ul.products li.product .button svg,
+.woocommerce ul.products li.product .beauty-card__cta svg {
+  display: block;
+}
+
+.jp-btn--icon:hover,
+.woocommerce ul.products li.product .button:hover,
+.woocommerce ul.products li.product .beauty-card__cta:hover {
+  background: var(--jp-primary);
+  color: #fff;
+  transform: none;
+}
+
+.woocommerce ul.products li.product .button.loading {
+  opacity: 0.7;
+}
+
+/* —— Input —— */
+.jp-input,
+input.jp-input,
+textarea.jp-input,
+.woocommerce form .form-row input.input-text,
+.woocommerce form .form-row textarea,
+.woocommerce-page form .input-text,
+.woocommerce-product-search .search-field,
+.site-search .search-field,
+.beauty-search-panel input[type="search"],
+.beauty-search-panel input[type="text"],
+.beauty-newsletter input[type="email"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--jp-surface-elevated);
+  border: 1px solid var(--jp-border);
+  border-radius: var(--jp-radius);
+  box-sizing: border-box;
+  color: var(--jp-ink);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  min-height: var(--jp-btn-h);
+  padding: 0.65rem 0.9rem;
+  transition:
+    border-color var(--jp-duration) var(--jp-ease),
+    box-shadow var(--jp-duration) var(--jp-ease),
+    background var(--jp-duration) var(--jp-ease);
+  width: 100%;
+}
+
+.jp-input::placeholder,
+input.jp-input::placeholder,
+.woocommerce-product-search .search-field::placeholder,
+.site-search .search-field::placeholder,
+.beauty-search-panel input::placeholder,
+.beauty-newsletter input[type="email"]::placeholder {
+  color: #9a958c;
+  opacity: 1;
+}
+
+.jp-input:hover,
+input.jp-input:hover,
+.woocommerce-product-search .search-field:hover,
+.site-search .search-field:hover {
+  border-color: #d0cbc2;
+}
+
+.jp-input:focus,
+input.jp-input:focus,
+textarea.jp-input:focus,
+.woocommerce form .form-row input.input-text:focus,
+.woocommerce form .form-row textarea:focus,
+.woocommerce-product-search .search-field:focus,
+.site-search .search-field:focus,
+.beauty-search-panel input:focus,
+.beauty-newsletter input[type="email"]:focus {
+  background: #fff;
+  border-color: var(--jp-matcha-text);
+  box-shadow: var(--jp-focus-ring);
+  outline: none;
+}
+
+.jp-input--search {
+  padding-right: 2.85rem;
+}
+
+/* —— Card —— */
+.jp-card,
+.woocommerce ul.products li.product,
+.woocommerce ul.products li.product.beauty-card {
+  background: var(--jp-surface-elevated);
+  border: none;
+  border-radius: var(--jp-radius-card);
+  box-shadow: 0 8px 28px rgba(17, 24, 39, 0.06);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-align: left;
+  transition:
+    box-shadow var(--jp-duration) var(--jp-ease);
+}
+
+.woocommerce ul.products li.product {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.jp-card--hover:hover,
+.woocommerce ul.products li.product:hover,
+.woocommerce ul.products li.product.beauty-card:hover {
+  box-shadow: 0 12px 36px rgba(17, 24, 39, 0.1);
+  transform: none;
+}
+
+.beauty-card__media {
+  aspect-ratio: 1 / 1;
+  background: var(--jp-paper);
+  overflow: hidden;
+  position: relative;
+}
+
+.beauty-card__media-link {
+  display: block;
+  height: 100%;
+  inset: 0;
+  line-height: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 0;
+}
+
+.jp-card__media,
+.woocommerce ul.products li.product img,
+.beauty-card__media img {
+  aspect-ratio: auto;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  padding: 0;
+  transition: transform 0.45s var(--jp-ease, cubic-bezier(0.22, 1, 0.36, 1));
+  width: 100%;
+  will-change: transform;
+}
+
+.woocommerce ul.products li.product:hover .beauty-card__media img,
+.beauty-card:hover .beauty-card__media img {
+  transform: scale(1.08);
+}
+
+.beauty-card__body,
+.jp-card__body {
+  align-items: flex-end;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: row;
+  gap: 0.75rem;
+  justify-content: space-between;
+  padding: 1rem 1.15rem 1.2rem;
+}
+
+.beauty-card__info {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.beauty-card__title,
+.jp-card__title {
+  color: var(--jp-ink);
+  display: -webkit-box;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.35;
+  margin: 0;
+  overflow: hidden;
+  text-decoration: none;
+}
+
+.beauty-card__title:hover {
+  color: var(--jp-primary);
+}
+
+.jp-card__meta {
+  color: var(--jp-muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.woocommerce ul.products li.product .beauty-card__info .price {
+  color: var(--jp-primary);
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+}
+
+.woocommerce ul.products li.product .beauty-card__info .price del {
+  color: var(--jp-muted);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 0.35rem;
+}
+
+.woocommerce ul.products li.product .beauty-card__info .price ins {
+  text-decoration: none;
+}
+
+/* —— Badge —— */
+.jp-badge,
+.woocommerce span.onsale {
+  background: var(--jp-vermillion);
+  border-radius: var(--jp-radius);
+  color: #fff;
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  min-height: auto;
+  min-width: auto;
+  padding: 0.35rem 0.6rem;
+  text-transform: uppercase;
+}
+
+/* —— Section —— */
+.jp-section,
+.beauty-section {
+  --jp-section-promo: var(--jp-primary);
+  margin: 0 auto 3.5rem;
+  max-width: var(--jp-container);
+  padding: 0 var(--jp-space-lg);
+}
+
+.jp-section--beauty,
+.beauty-section--beauty {
+  --jp-section-promo: #503434;
+}
+
+.jp-section--supplement,
+.beauty-section--supplement {
+  --jp-section-promo: var(--jp-indigo);
+}
+
+.jp-section__head,
+.beauty-section__header {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--jp-space-md);
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.jp-section__heading,
+.beauty-section__heading {
+  flex: 1 1 auto;
+  min-width: 12rem;
+}
+
+.jp-section__title,
+.beauty-section__title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  margin: 0;
+}
+
+.jp-section__desc,
+.beauty-section__desc {
+  color: var(--jp-muted);
+  font-size: 0.95rem;
+  margin: 0.5rem 0 0;
+}
+
+.jp-section__body,
+.beauty-section__body {
+  align-items: stretch;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(220px, 1fr) 3.4fr;
+}
+
+@media (max-width: 1024px) {
+  .jp-section__body,
+  .beauty-section__body {
+    grid-template-columns: 1fr;
+  }
+}
