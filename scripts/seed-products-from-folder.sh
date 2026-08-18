@@ -190,7 +190,11 @@ title_exists() {
 create_one() {
   local needle="$1" name="$2" cat_slug="$3" brand="$4" price="$5" stock="$6" sale="${7:-}" slug_fixed="${8:-}"
   local folder slug existing cat_id pid short desc
-  folder=$(find_folder "$needle" || true)
+  if [ -d "$needle" ]; then
+    folder="${needle%/}"
+  else
+    folder=$(find_folder "$needle" || true)
+  fi
   if [ -z "$folder" ]; then
     log "SKIP no folder: $needle"
     return
@@ -229,7 +233,7 @@ create_one() {
     --regular_price="$price"
     --manage_stock=1
     --stock_quantity="$stock"
-    --sku="JP-${slug:0:20}"
+    --sku="JP-${slug}"
     --short_description="$short"
     --description="$desc"
     --user="$ADMIN"
@@ -274,6 +278,74 @@ create_one() {
   log "OK #$pid $name ($cat_slug) imgs=${#img_ids[@]}"
 }
 
+guess_cat() {
+  local n="$1"
+  case "$n" in
+    *[Ss]erum*|*[Ee]ssence*) echo 'serum' ;;
+    *"ặt nạ"*) echo 'mat-na' ;;
+    *SRM*|*[Ss]rm*|*"ửa mặt"*|*"ẩy trang"*) echo 'rua-mat' ;;
+    *[Tt]oner*|*"ước hoa hồng"*) echo 'toner' ;;
+    *[Gg]ội*|*[Ii]chikami*|*[Tt]subaki*|*salonlink*) echo 'dau-goi' ;;
+    *"ánh răng"*|*"ơm miệng"*|*Ora2*) echo 'cham-soc-rang-mieng' ;;
+    *"ữa tắm"*|*"ắm Hato"*) echo 'sua-tam' ;;
+    *[Cc]ollagen*|*NMN*|*"ên uống"*|*"Trà "*|*"trà "*) echo 'tpcn' ;;
+    *"ưỡng thể"*|*"ưỡng Da"*|*"em mắt"*|*"môi DHC"*|*"ống nắng"*) echo 'kem-duong' ;;
+    *"ệ sinh"*|*"ửa bát"*|*"ước giặt"*|*"ỚC GIẶT"*|*"ộp Hút"*|*"ói sưởi"*|*"uổi Muỗi"*|*[Ff]umakilla*) echo 'hang-tieu-dung' ;;
+    *"ượu"*|*"ánh gạo"*|*[Mm]iso*|*[Mm]atcha*) echo 'thuc-pham-nhat' ;;
+    *) echo 'my-pham-nhat' ;;
+  esac
+}
+
+guess_brand() {
+  local n="$1"
+  case "$n" in
+    *[Hh]atomugi*) echo 'Hatomugi' ;;
+    *[Ii]chikami*) echo 'Kracie' ;;
+    *[Tt]subaki*) echo 'Shiseido' ;;
+    *[Mm]eishoku*) echo 'Meishoku' ;;
+    *Ora2*) echo 'Sunstar' ;;
+    *[Kk]ao*) echo 'Kao' ;;
+    *[Ll]aurie*) echo 'Laurier' ;;
+    *[Ff]umakilla*) echo 'Fumakilla' ;;
+    *[Mm]anis*) echo 'Manis' ;;
+    *[Oo]rihiro*) echo 'Orihiro' ;;
+    *[Ii]ris\ [Oo]hyama*) echo 'Iris Ohyama' ;;
+    *[Hh]akugen*) echo 'Hakugen' ;;
+    *[Ll]ingerie*|*LINGERIE*) echo 'Lingerie' ;;
+    *[Ss]alonlink*) echo 'Salon Link' ;;
+    *[Ww]hite\ and\ [Ww]hite*) echo 'Lion' ;;
+    *) echo 'Japan' ;;
+  esac
+}
+
+rand_price() {
+  local base=$((RANDOM % 400 + 80))
+  echo $((base * 1000))
+}
+
+seed_all_folders() {
+  local d base cat brand price stock sale
+  shopt -s nullglob
+  for d in "$PRODUCTS_DIR"/*/; do
+    base=$(basename "$d")
+    # Skip folders with no direct images (category-only folders)
+    local imgs=("$d"*.jpg "$d"*.JPG "$d"*.jpeg "$d"*.JPEG "$d"*.png "$d"*.PNG "$d"*.webp)
+    if [ ${#imgs[@]} -eq 0 ]; then
+      log "SKIP category folder (no images): $base"
+      continue
+    fi
+    cat=$(guess_cat "$base")
+    brand=$(guess_brand "$base")
+    price=$(rand_price)
+    stock=$((RANDOM % 60 + 20))
+    sale=''
+    if [ $((RANDOM % 4)) -eq 0 ]; then
+      sale=$((price * 85 / 100))
+    fi
+    create_one "$d" "$base" "$cat" "$brand" "$price" "$stock" "$sale" ''
+  done
+}
+
 main() {
   if ! $WP core is-installed >/dev/null 2>&1; then
     echo "WordPress not installed." >&2
@@ -286,26 +358,7 @@ main() {
 
   ensure_tree
 
-  create_one 'Pure Beau' 'Serum Pure Beau Essence' 'serum' 'Pure Beau' 389000 42 342000 serum-pure-beau-essence
-  create_one 'Serum kracie' 'Serum Kracie' 'serum' 'Kracie' 295000 38 '' serum-kracie
-  create_one '170g' 'SRM Hatomugi trắng 170g' 'rua-mat' 'Hatomugi' 165000 60 '' srm-hatomugi-trang-170g
-  create_one '130g' 'SRM Hatomugi trắng 130g' 'rua-mat' 'Hatomugi' 145000 55 '' srm-hatomugi-trang-130g
-  create_one 'SRM trà xanh' 'SRM trà xanh' 'rua-mat' 'Rohto' 125000 48 '' srm-tra-xanh
-  create_one 'Posh Kosh' 'Mặt nạ Posh Kosh 30 sheet' 'mat-na' 'Posh Kosh' 210000 40 '' mat-na-posh-kosh-30
-  create_one 'Keana' 'Mặt nạ gạo Keana' 'mat-na' 'Keana' 189000 35 '' mat-na-gao-keana
-  create_one 'white serum' 'Mặt nạ White Serum' 'mat-na' 'Japan Gals' 225000 32 198000 mat-na-white-serum
-  create_one 'Meishoku' 'Kem mắt Meishoku' 'kem-duong' 'Meishoku' 275000 28 '' kem-mat-meishoku
-  create_one 'SunBears' 'Kem chống nắng OMI SunBears' 'kem-duong' 'OMI' 198000 50 '' kem-chong-nang-omi-sunbears
-  create_one 'Skin Aqua' 'KCN Skin Aqua Hồng' 'kem-duong' 'Rohto Mentholatum' 215000 45 '' kcn-skin-aqua-hong
-  create_one 'Tsubaki' 'Cặp gội xả Tsubaki hộp vàng' 'dau-goi' 'Tsubaki' 320000 36 285000 cap-goi-tsubaki-hop-vang
-  create_one 'Manis' 'Sữa tắm Manis Hoa cúc' 'sua-tam' 'Manis' 175000 44 '' sua-tam-manis-hoa-cuc
-  create_one '600ml' 'Sữa tắm Hatomugi xanh 600ml' 'sua-tam' 'Hatomugi' 189000 40 '' sua-tam-hatomugi-xanh-600ml
-  create_one 'White and White' 'Kem đánh răng White and White' 'cham-soc-rang-mieng' 'Lion' 89000 70 '' kem-danh-rang-white-and-white
-  create_one 'Ora2' 'Kem đánh răng Ora2' 'cham-soc-rang-mieng' 'Ora2' 95000 65 '' kem-danh-rang-ora2
-  create_one 'NMN' 'Viên uống NMN 40 viên' 'tpcn' 'Japan' 890000 22 790000 vien-uong-nmn-40
-  create_one '13000' 'Collagen Placenta 13000+' 'tpcn' 'Earth' 650000 26 '' collagen-placenta-13000
-  create_one 'genpi' 'Trà Genpi' 'thuc-pham-nhat' 'Yamamoto' 185000 50 '' tra-genpi
-  create_one 'DHC' 'Ủ môi DHC' 'kem-duong' 'DHC' 165000 40 '' u-moi-dhc
+  seed_all_folders
 
   local count
   count=$($WP post list --post_type=product --format=count 2>/dev/null || echo '?')
