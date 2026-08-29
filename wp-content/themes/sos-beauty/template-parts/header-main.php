@@ -35,5 +35,10 @@ $tel     = preg_replace( '/\s+/', '', $hotline );
 				</span>
 			</a>
 		<?php endif; ?>
+		<?php
+		if ( function_exists( 'sos_beauty_header_cart' ) ) {
+			sos_beauty_header_cart();
+		}
+		?>
 	</div>
 </div>

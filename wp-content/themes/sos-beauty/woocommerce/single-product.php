@@ -57,37 +57,32 @@ if ( post_password_required() ) {
 	</div>
 
 	<div class="beauty-pdp__tabs">
-		<?php
-		/**
-		 * Hook: woocommerce_after_single_product_summary.
-		 *
-		 * @hooked woocommerce_output_product_data_tabs - 10
-		 * @hooked woocommerce_upsell_display - 15
-		 * @hooked woocommerce_output_related_products - 20
-		 */
-		do_action( 'woocommerce_after_single_product_summary' );
-		?>
+		<?php woocommerce_output_product_data_tabs(); ?>
 	</div>
 
 	<?php
-	/**
-	 * Related products — custom wrapper for styling.
-	 */
-	$related_products = wc_get_related_products( get_the_ID(), 4 );
-	if ( $related_products ) :
+	$similar_ids = function_exists( 'sos_beauty_pdp_similar_ids' )
+		? sos_beauty_pdp_similar_ids( get_the_ID(), 4 )
+		: array();
+	if ( $similar_ids ) :
 		?>
-		<section class="beauty-pdp__related">
-			<h2 class="beauty-pdp__related-title"><?php esc_html_e( 'Sản phẩm liên quan', 'sos-beauty' ); ?></h2>
-			<?php
-			woocommerce_product_loop_start();
-			foreach ( $related_products as $related_product ) {
-				$post_object = get_post( $related_product );
-				setup_postdata( $GLOBALS['post'] =& $post_object ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
-				wc_get_template_part( 'content', 'product' );
-			}
-			woocommerce_product_loop_end();
-			wp_reset_postdata();
-			?>
+		<section class="beauty-pdp__related" aria-labelledby="beauty-pdp-related-heading">
+			<h2 id="beauty-pdp-related-heading" class="beauty-pdp__related-title"><?php esc_html_e( 'Có thể bạn quan tâm', 'sos-beauty' ); ?></h2>
+			<div class="woocommerce">
+				<?php
+				woocommerce_product_loop_start();
+				foreach ( $similar_ids as $similar_id ) {
+					$post_object = get_post( $similar_id );
+					if ( ! $post_object ) {
+						continue;
+					}
+					setup_postdata( $GLOBALS['post'] =& $post_object ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
+					wc_get_template_part( 'content', 'product' );
+				}
+				woocommerce_product_loop_end();
+				wp_reset_postdata();
+				?>
+			</div>
 		</section>
 	<?php endif; ?>
 </div>

@@ -40,14 +40,21 @@ $categories = array(
 
 $sections = array(
 	array(
+		'class'       => 'beauty-section--exclusive',
+		'eyebrow'     => __( 'Chỉ có tại JP', 'sos-beauty' ),
+		'title'       => __( 'Sản phẩm độc quyền', 'sos-beauty' ),
+		'desc'        => __( 'Hàng chọn lọc, không bán đại trà', 'sos-beauty' ),
+		'more_url'    => $shop_url,
+		'shortcode'   => '[products limit="8" columns="4" exclusive="yes" orderby="date"]',
+		'require_meta'=> '_sos_exclusive',
+	),
+	array(
 		'class'       => '',
 		'eyebrow'     => __( 'Bán chạy nhất', 'sos-beauty' ),
 		'title'       => __( 'Sản phẩm nổi bật', 'sos-beauty' ),
 		'desc'        => __( 'Được khách hàng tin chọn', 'sos-beauty' ),
 		'more_url'    => $shop_url,
-		'shortcode'   => '[products limit="3" columns="3" orderby="popularity"]',
-		'promo_eyebrow' => __( 'Chọn theo gu', 'sos-beauty' ),
-		'promo_title'   => __( 'Tinh tuyển từ Nhật Bản cho bạn.', 'sos-beauty' ),
+		'shortcode'   => '[products limit="8" columns="4" orderby="popularity"]',
 	),
 	array(
 		'class'       => 'beauty-section--beauty',
@@ -55,9 +62,7 @@ $sections = array(
 		'title'       => __( 'Mỹ phẩm', 'sos-beauty' ),
 		'desc'        => __( 'Skincare, tóc & chăm sóc cơ thể', 'sos-beauty' ),
 		'more_url'    => sos_beauty_category_link( 'my-pham-nhat' ),
-		'shortcode'   => '[product_category category="my-pham-nhat" limit="3" columns="3"]',
-		'promo_eyebrow' => __( 'Chăm da chuẩn Nhật', 'sos-beauty' ),
-		'promo_title'   => __( 'Làn da khỏe, lớp nền nhẹ.', 'sos-beauty' ),
+		'shortcode'   => '[product_category category="my-pham-nhat" limit="8" columns="4"]',
 	),
 	array(
 		'class'       => 'beauty-section--supplement',
@@ -65,9 +70,7 @@ $sections = array(
 		'title'       => __( 'Hàng tiêu dùng', 'sos-beauty' ),
 		'desc'        => __( 'TPCN & sản phẩm dùng hàng ngày', 'sos-beauty' ),
 		'more_url'    => sos_beauty_category_link( 'hang-tieu-dung' ),
-		'shortcode'   => '[product_category category="hang-tieu-dung" limit="3" columns="3"]',
-		'promo_eyebrow' => __( 'Bổ sung mỗi ngày', 'sos-beauty' ),
-		'promo_title'   => __( 'Một lựa chọn vừa vặn cho cơ thể.', 'sos-beauty' ),
+		'shortcode'   => '[product_category category="hang-tieu-dung" limit="8" columns="4"]',
 	),
 	array(
 		'class'       => 'beauty-section--food',
@@ -75,9 +78,7 @@ $sections = array(
 		'title'       => __( 'Thực phẩm', 'sos-beauty' ),
 		'desc'        => __( 'Matcha, miso, gạo & đặc sản', 'sos-beauty' ),
 		'more_url'    => sos_beauty_category_link( 'thuc-pham-nhat' ),
-		'shortcode'   => '[product_category category="thuc-pham-nhat" limit="3" columns="3"]',
-		'promo_eyebrow' => __( 'Vị Nhật mỗi ngày', 'sos-beauty' ),
-		'promo_title'   => __( 'Hương vị tươi lành cho căn bếp.', 'sos-beauty' ),
+		'shortcode'   => '[product_category category="thuc-pham-nhat" limit="8" columns="4"]',
 	),
 );
 
@@ -121,6 +122,23 @@ $trust_items = array(
 </nav>
 
 <?php foreach ( $sections as $section ) : ?>
+	<?php
+	if ( ! empty( $section['require_meta'] ) ) {
+		$has_exclusive = get_posts(
+			array(
+				'post_type'      => 'product',
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'fields'         => 'ids',
+				'meta_key'       => $section['require_meta'],
+				'meta_value'     => 'yes',
+			)
+		);
+		if ( empty( $has_exclusive ) ) {
+			continue;
+		}
+	}
+	?>
 	<section class="beauty-section <?php echo esc_attr( $section['class'] ); ?>">
 		<header class="beauty-section__header">
 			<div class="beauty-section__heading">
@@ -130,10 +148,6 @@ $trust_items = array(
 			<a class="beauty-section__more" href="<?php echo esc_url( $section['more_url'] ); ?>"><? esc_html_e( 'Xem tất cả', 'sos-beauty' ); ?></a>
 		</header>
 		<div class="beauty-section__body">
-			<a class="beauty-section__promo" href="<?php echo esc_url( $section['more_url'] ); ?>">
-				<span class="beauty-section__promo-eyebrow"><?php echo esc_html( $section['promo_eyebrow'] ); ?></span>
-				<span class="beauty-section__promo-title"><?php echo esc_html( $section['promo_title'] ); ?></span>
-			</a>
 			<div class="beauty-section__products">
 				<?php echo do_shortcode( $section['shortcode'] ); ?>
 			</div>
@@ -156,6 +170,41 @@ $trust_items = array(
 		<?php endforeach; ?>
 	</ul>
 </section>
+
+<?php
+$news_query = new WP_Query(
+	array(
+		'post_type'           => 'post',
+		'posts_per_page'      => 3,
+		'ignore_sticky_posts' => true,
+		'no_found_rows'       => true,
+	)
+);
+$blog_id  = (int) get_option( 'page_for_posts' );
+$news_url = $blog_id ? get_permalink( $blog_id ) : home_url( '/tin-tuc/' );
+if ( $news_query->have_posts() ) :
+	?>
+<section class="beauty-home-news" aria-labelledby="beauty-home-news-heading">
+	<header class="beauty-section__header">
+		<div class="beauty-section__heading">
+			<p class="beauty-section__eyebrow"><?php esc_html_e( 'Tin tức', 'sos-beauty' ); ?></p>
+			<h2 id="beauty-home-news-heading" class="beauty-section__title"><?php esc_html_e( 'Bài viết', 'sos-beauty' ); ?></h2>
+		</div>
+		<a class="beauty-section__more" href="<?php echo esc_url( $news_url ); ?>"><?php esc_html_e( 'Xem tất cả', 'sos-beauty' ); ?></a>
+	</header>
+	<div class="beauty-news-grid">
+		<?php
+		while ( $news_query->have_posts() ) :
+			$news_query->the_post();
+			get_template_part( 'content' );
+		endwhile;
+		wp_reset_postdata();
+		?>
+	</div>
+</section>
+	<?php
+endif;
+?>
 
 <?php
 get_footer();

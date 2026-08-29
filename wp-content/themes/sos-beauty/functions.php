@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SOS_BEAUTY_VERSION', '1.11.13' );
+define( 'SOS_BEAUTY_VERSION', '1.11.42' );
 
 /**
  * Brand logo / favicon paths (theme assets).
@@ -96,6 +96,45 @@ function sos_beauty_header_container_open() {
 function sos_beauty_header_main_row() {
 	get_template_part( 'template-parts/header-main' );
 }
+
+/**
+ * Header cart — icon + count, next to hotline.
+ */
+function sos_beauty_header_cart_html() {
+	$count = ( function_exists( 'WC' ) && WC()->cart ) ? (int) WC()->cart->get_cart_contents_count() : 0;
+	$url   = function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' );
+	$label = sprintf(
+		/* translators: %d: item count */
+		_n( '%d sản phẩm', '%d sản phẩm', $count, 'sos-beauty' ),
+		$count
+	);
+	ob_start();
+	?>
+	<a class="beauty-header-cart" href="<?php echo esc_url( $url ); ?>" aria-label="<?php echo esc_attr( sprintf( __( 'Giỏ hàng, %s', 'sos-beauty' ), $label ) ); ?>">
+		<span class="beauty-header-cart__icon" aria-hidden="true">
+			<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+			<?php if ( $count > 0 ) : ?>
+				<span class="beauty-header-cart__badge"><?php echo esc_html( (string) $count ); ?></span>
+			<?php endif; ?>
+		</span>
+		<span class="beauty-header-cart__text">
+			<span class="beauty-header-cart__label"><?php esc_html_e( 'Giỏ hàng', 'sos-beauty' ); ?></span>
+			<span class="beauty-header-cart__count"><?php echo esc_html( $label ); ?></span>
+		</span>
+	</a>
+	<?php
+	return ob_get_clean();
+}
+
+function sos_beauty_header_cart() {
+	echo '<div id="sos-beauty-header-cart">' . sos_beauty_header_cart_html() . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- built in sos_beauty_header_cart_html()
+}
+
+function sos_beauty_header_cart_fragment( $fragments ) {
+	$fragments['#sos-beauty-header-cart'] = '<div id="sos-beauty-header-cart">' . sos_beauty_header_cart_html() . '</div>';
+	return $fragments;
+}
+add_filter( 'woocommerce_add_to_cart_fragments', 'sos_beauty_header_cart_fragment' );
 
 /**
  * Product search form — VN placeholder + icon submit.
@@ -279,6 +318,81 @@ function sos_beauty_supplement_tab() {
 	}
 	echo '</div>';
 }
+
+/**
+ * Exclusive products — admin checkbox on Product data → General.
+ * Meta key: _sos_exclusive = yes
+ */
+function sos_beauty_exclusive_product_field() {
+	woocommerce_wp_checkbox(
+		array(
+			'id'          => '_sos_exclusive',
+			'label'       => __( 'Sản phẩm độc quyền', 'sos-beauty' ),
+			'description' => __( 'Hiện ở mục Sản phẩm độc quyền trên trang chủ.', 'sos-beauty' ),
+			'desc_tip'    => true,
+		)
+	);
+}
+add_action( 'woocommerce_product_options_general_product_data', 'sos_beauty_exclusive_product_field' );
+
+function sos_beauty_exclusive_product_field_save( $post_id ) {
+	$exclusive = isset( $_POST['_sos_exclusive'] ) ? 'yes' : 'no'; // phpcs:ignore WordPress.Security.NonceVerification.Missing -- WC handles nonce.
+	update_post_meta( $post_id, '_sos_exclusive', $exclusive );
+}
+add_action( 'woocommerce_process_product_meta', 'sos_beauty_exclusive_product_field_save' );
+
+/**
+ * Products list column: show Độc quyền flag.
+ */
+function sos_beauty_exclusive_products_column( $columns ) {
+	$new = array();
+	foreach ( $columns as $key => $label ) {
+		$new[ $key ] = $label;
+		if ( 'name' === $key ) {
+			$new['sos_exclusive'] = __( 'Độc quyền', 'sos-beauty' );
+		}
+	}
+	return $new;
+}
+add_filter( 'manage_edit-product_columns', 'sos_beauty_exclusive_products_column', 20 );
+
+function sos_beauty_exclusive_products_column_content( $column, $post_id ) {
+	if ( 'sos_exclusive' !== $column ) {
+		return;
+	}
+	if ( 'yes' === get_post_meta( $post_id, '_sos_exclusive', true ) ) {
+		echo '<span class="dashicons dashicons-yes-alt" style="color:#2e7d32;" title="' . esc_attr__( 'Độc quyền', 'sos-beauty' ) . '"></span>';
+	} else {
+		echo '<span class="dashicons dashicons-minus" style="color:#ccc;"></span>';
+	}
+}
+add_action( 'manage_product_posts_custom_column', 'sos_beauty_exclusive_products_column_content', 10, 2 );
+
+/**
+ * Shortcode attr exclusive="yes" for [products].
+ */
+function sos_beauty_products_shortcode_exclusive_query( $query_args, $attributes ) {
+	if ( empty( $attributes['exclusive'] ) || 'yes' !== $attributes['exclusive'] ) {
+		return $query_args;
+	}
+	if ( empty( $query_args['meta_query'] ) || ! is_array( $query_args['meta_query'] ) ) {
+		$query_args['meta_query'] = array();
+	}
+	$query_args['meta_query'][] = array(
+		'key'   => '_sos_exclusive',
+		'value' => 'yes',
+	);
+	return $query_args;
+}
+add_filter( 'woocommerce_shortcode_products_query', 'sos_beauty_products_shortcode_exclusive_query', 10, 2 );
+
+function sos_beauty_products_shortcode_exclusive_atts( $out, $pairs, $atts ) {
+	if ( isset( $atts['exclusive'] ) ) {
+		$out['exclusive'] = sanitize_text_field( $atts['exclusive'] );
+	}
+	return $out;
+}
+add_filter( 'shortcode_atts_products', 'sos_beauty_products_shortcode_exclusive_atts', 10, 3 );
 
 /**
  * Show volume/size after product title on archive.
@@ -780,6 +894,55 @@ function sos_beauty_remove_shop_header() {
 add_action( 'wp', 'sos_beauty_remove_shop_header' );
 
 /**
+ * Centered category heading above shop grid (name + term description).
+ */
+function sos_beauty_shop_category_heading() {
+	if ( ! function_exists( 'is_woocommerce' ) ) {
+		return;
+	}
+	if ( is_product() || is_cart() || is_checkout() || is_account_page() ) {
+		return;
+	}
+	if ( ! is_shop() && ! is_product_taxonomy() ) {
+		return;
+	}
+
+	static $done = false;
+	if ( $done ) {
+		return;
+	}
+	$done = true;
+
+	$title = '';
+	$desc  = '';
+
+	if ( is_product_taxonomy() ) {
+		$term = get_queried_object();
+		if ( $term && ! empty( $term->name ) ) {
+			$title = $term->name;
+			$desc  = term_description( $term );
+		}
+	} elseif ( is_shop() ) {
+		$title = woocommerce_page_title( false );
+		if ( ! $title ) {
+			$title = __( 'Sản phẩm', 'sos-beauty' );
+		}
+	}
+
+	if ( '' === $title ) {
+		return;
+	}
+
+	echo '<header class="beauty-shop-heading">';
+	echo '<h3 class="beauty-shop-heading__title">' . esc_html( $title ) . '</h3>';
+	if ( $desc ) {
+		echo '<div class="beauty-shop-heading__desc">' . wp_kses_post( $desc ) . '</div>';
+	}
+	echo '</header>';
+}
+add_action( 'storefront_content_top', 'sos_beauty_shop_category_heading', 20 );
+
+/**
  * Shop / product archives get the category sidebar.
  */
 function sos_beauty_show_shop_sidebar() {
@@ -1173,11 +1336,92 @@ function sos_beauty_pdp_template_setup() {
 	// Remove Storefront's default single product hooks.
 	remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10 );
 	remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+	remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15 );
 
 	// Move sale flash into summary.
 	add_action( 'woocommerce_single_product_summary', 'woocommerce_show_product_sale_flash', 4 );
 }
 add_action( 'wp', 'sos_beauty_pdp_template_setup' );
+
+/**
+ * Similar product IDs for PDP "Có thể bạn quan tâm".
+ * WC related first, then same category, then any catalog product.
+ *
+ * @param int $product_id Product ID.
+ * @param int $limit      Max products.
+ * @return int[]
+ */
+function sos_beauty_pdp_similar_ids( $product_id, $limit = 4 ) {
+	$product_id = (int) $product_id;
+	$limit      = max( 1, (int) $limit );
+	if ( $product_id < 1 ) {
+		return array();
+	}
+
+	$ids = array();
+	if ( function_exists( 'wc_get_related_products' ) ) {
+		$related = wc_get_related_products( $product_id, $limit );
+		if ( is_array( $related ) ) {
+			$ids = array_values( array_filter( array_map( 'intval', $related ) ) );
+		}
+	}
+	if ( count( $ids ) >= $limit ) {
+		return array_slice( $ids, 0, $limit );
+	}
+
+	$visibility = array(
+		'taxonomy' => 'product_visibility',
+		'field'    => 'name',
+		'terms'    => array( 'exclude-from-catalog', 'exclude-from-search' ),
+		'operator' => 'NOT IN',
+	);
+
+	$fill = function ( $args ) {
+		$query = new WP_Query( $args );
+		return $query->posts ? array_map( 'intval', $query->posts ) : array();
+	};
+
+	$exclude = array_merge( array( $product_id ), $ids );
+	$need    = $limit - count( $ids );
+	$base    = array(
+		'post_type'              => 'product',
+		'post_status'            => 'publish',
+		'posts_per_page'         => $need,
+		'post__not_in'           => $exclude,
+		'fields'                 => 'ids',
+		'orderby'                => 'rand',
+		'no_found_rows'          => true,
+		'update_post_meta_cache' => false,
+		'update_post_term_cache' => false,
+		'tax_query'              => array( $visibility ),
+	);
+
+	$cats = function_exists( 'wc_get_product_term_ids' ) ? wc_get_product_term_ids( $product_id, 'product_cat' ) : array();
+	if ( $cats ) {
+		$cat_args               = $base;
+		$cat_args['tax_query']  = array(
+			'relation' => 'AND',
+			$visibility,
+			array(
+				'taxonomy' => 'product_cat',
+				'field'    => 'term_id',
+				'terms'    => $cats,
+			),
+		);
+		$extra                  = $fill( $cat_args );
+		$ids                    = array_merge( $ids, $extra );
+		$exclude                = array_merge( $exclude, $extra );
+		$need                   = $limit - count( $ids );
+		$base['post__not_in']   = $exclude;
+		$base['posts_per_page'] = $need;
+	}
+
+	if ( $need > 0 ) {
+		$ids = array_merge( $ids, $fill( $base ) );
+	}
+
+	return array_slice( array_values( array_unique( $ids ) ), 0, $limit );
+}
 
 /**
  * Free-shipping progress bar in cart.
@@ -1302,10 +1546,10 @@ function sos_beauty_render_float_contact() {
 add_action( 'wp_footer', 'sos_beauty_render_float_contact', 20 );
 
 /**
- * Static pages (Liên hệ, Giới thiệu): drop Storefront breadcrumb.
+ * Drop Storefront breadcrumb on contact, about, and posts.
  */
 function sos_beauty_contact_page_cleanup() {
-	if ( ! is_page( array( 'lien-he', 'gioi-thieu' ) ) ) {
+	if ( ! is_page( array( 'lien-he', 'gioi-thieu' ) ) && ! is_singular( 'post' ) && ! is_home() ) {
 		return;
 	}
 	remove_action( 'storefront_before_content', 'woocommerce_breadcrumb', 10 );
@@ -1321,6 +1565,213 @@ function sos_beauty_breadcrumb_defaults( $defaults ) {
 	return $defaults;
 }
 add_filter( 'woocommerce_breadcrumb_defaults', 'sos_beauty_breadcrumb_defaults', 99 );
+
+add_action( 'init', 'sos_beauty_page_excerpt_support' );
+function sos_beauty_page_excerpt_support() {
+	add_post_type_support( 'page', 'excerpt' );
+}
+
+/**
+ * Gutenberg palette = MASTER tokens (navy + neutrals). Blocks on /gioi-thieu/ inherit these.
+ */
+function sos_beauty_editor_palette() {
+	add_theme_support(
+		'editor-color-palette',
+		array(
+			array(
+				'name'  => __( 'Navy', 'sos-beauty' ),
+				'slug'  => 'jp-primary',
+				'color' => '#232D6C',
+			),
+			array(
+				'name'  => __( 'Ink', 'sos-beauty' ),
+				'slug'  => 'jp-ink',
+				'color' => '#111827',
+			),
+			array(
+				'name'  => __( 'Muted', 'sos-beauty' ),
+				'slug'  => 'jp-muted',
+				'color' => '#6B7280',
+			),
+			array(
+				'name'  => __( 'Border', 'sos-beauty' ),
+				'slug'  => 'jp-border',
+				'color' => '#E5E7EB',
+			),
+			array(
+				'name'  => __( 'Paper', 'sos-beauty' ),
+				'slug'  => 'jp-paper',
+				'color' => '#F9FAFB',
+			),
+			array(
+				'name'  => __( 'White', 'sos-beauty' ),
+				'slug'  => 'jp-surface',
+				'color' => '#FFFFFF',
+			),
+		)
+	);
+	add_theme_support( 'disable-custom-colors' );
+	add_theme_support( 'disable-custom-gradients' );
+	add_theme_support( 'editor-gradient-presets', array() );
+	add_theme_support(
+		'editor-font-sizes',
+		array(
+			array(
+				'name' => __( 'Small', 'sos-beauty' ),
+				'slug' => 'small',
+				'size' => 14,
+			),
+			array(
+				'name' => __( 'Normal', 'sos-beauty' ),
+				'slug' => 'normal',
+				'size' => 16,
+			),
+			array(
+				'name' => __( 'Large', 'sos-beauty' ),
+				'slug' => 'large',
+				'size' => 20,
+			),
+		)
+	);
+}
+add_action( 'after_setup_theme', 'sos_beauty_editor_palette', 20 );
+
+/**
+ * Giới thiệu — editable from Pages admin (title, excerpt, content, featured image + metabox).
+ */
+function sos_beauty_about_meta( $post_id, $key, $default = '' ) {
+	$val = get_post_meta( (int) $post_id, '_beauty_about_' . $key, true );
+	return ( is_string( $val ) && '' !== $val ) ? $val : $default;
+}
+
+function sos_beauty_about_metabox( $post_type, $post ) {
+	if ( 'page' !== $post_type || ! $post || empty( $post->post_name ) || 'gioi-thieu' !== $post->post_name ) {
+		return;
+	}
+	add_meta_box(
+		'sos_beauty_about',
+		__( 'Giới thiệu — các khối trang', 'sos-beauty' ),
+		'sos_beauty_about_metabox_render',
+		'page',
+		'normal',
+		'high'
+	);
+}
+add_action( 'add_meta_boxes', 'sos_beauty_about_metabox', 10, 2 );
+
+function sos_beauty_about_metabox_render( $post ) {
+	if ( 'gioi-thieu' !== $post->post_name ) {
+		return;
+	}
+	wp_nonce_field( 'sos_beauty_about_save', 'sos_beauty_about_nonce' );
+	$f = function ( $key, $default = '' ) use ( $post ) {
+		return sos_beauty_about_meta( $post->ID, $key, $default );
+	};
+	echo '<p class="description">' . esc_html__( 'Tiêu đề, mô tả ngắn (excerpt), nội dung và ảnh đại diện sửa ở khung soạn thảo phía trên. Địa chỉ / email / SĐT: Appearance → Customize → Footer.', 'sos-beauty' ) . '</p>';
+	$fields = array(
+		'eyebrow'         => array( 'label' => 'Dòng phụ (hero)', 'default' => 'Công ty TNHH JP Bùi Đặng' ),
+		'story_title'     => array( 'label' => 'Tiêu đề khối cam kết', 'default' => 'Cam kết của chúng tôi' ),
+		'values_eyebrow'  => array( 'label' => 'Eyebrow 3 cam kết', 'default' => 'Vì sao chọn chúng tôi' ),
+		'values_title'    => array( 'label' => 'Tiêu đề 3 cam kết', 'default' => 'Ba điều không đổi' ),
+		'quotes_eyebrow'  => array( 'label' => 'Eyebrow ý kiến', 'default' => 'Ý kiến khách hàng' ),
+		'quotes_title'    => array( 'label' => 'Tiêu đề ý kiến', 'default' => 'Niềm tin được kể lại' ),
+		'cta_eyebrow'     => array( 'label' => 'Eyebrow CTA', 'default' => 'Bắt đầu' ),
+		'cta_title'       => array( 'label' => 'Tiêu đề CTA', 'default' => 'Sẵn sàng chọn sản phẩm Nhật chính hãng?' ),
+	);
+	echo '<p><strong>' . esc_html__( 'Tiêu đề khối', 'sos-beauty' ) . '</strong></p>';
+	foreach ( $fields as $key => $row ) {
+		printf(
+			'<p><label>%s<br><input type="text" class="widefat" name="beauty_about[%s]" value="%s"></label></p>',
+			esc_html( $row['label'] ),
+			esc_attr( $key ),
+			esc_attr( $f( $key, $row['default'] ) )
+		);
+	}
+
+	echo '<p><strong>' . esc_html__( '4 mốc (số / nhãn)', 'sos-beauty' ) . '</strong></p>';
+	$stat_defaults = array(
+		array( '15+', 'năm nhập khẩu & phân phối' ),
+		array( 'JP', 'nguồn hàng chính hãng Nhật Bản' ),
+		array( '3', 'nhóm: mỹ phẩm, TPCN, thực phẩm' ),
+		array( 'VN', 'giao hàng toàn quốc' ),
+	);
+	for ( $i = 1; $i <= 4; $i++ ) {
+		$dv = $stat_defaults[ $i - 1 ][0];
+		$dl = $stat_defaults[ $i - 1 ][1];
+		printf(
+			'<p><input type="text" name="beauty_about[stat_%1$d_value]" value="%2$s" placeholder="Số" style="width:6rem"> <input type="text" class="widefat" style="width:70%%" name="beauty_about[stat_%1$d_label]" value="%3$s" placeholder="Nhãn"></p>',
+			$i,
+			esc_attr( $f( 'stat_' . $i . '_value', $dv ) ),
+			esc_attr( $f( 'stat_' . $i . '_label', $dl ) )
+		);
+	}
+
+	echo '<p><strong>' . esc_html__( '3 cam kết (tiêu đề / mô tả)', 'sos-beauty' ) . '</strong></p>';
+	$value_defaults = array(
+		array( 'Chính hãng, nguồn gốc rõ', 'Mỗi sản phẩm đi kèm nguồn nhập minh bạch — đúng mô tả, ổn định theo lô, không đánh đổi chất lượng vì giá.' ),
+		array( 'Tư vấn am hiểu', 'Đội ngũ theo sát J-Beauty và TPCN Nhật — gợi ý theo da, nhu cầu và ngân sách, không bán cho đủ đơn.' ),
+		array( 'Đồng hành lâu dài', 'Chính sách đổi trả 7 ngày, giao 2–3 ngày nội thành, hỗ trợ đại lý minh bạch — giữ niềm tin qua từng đơn.' ),
+	);
+	for ( $i = 1; $i <= 3; $i++ ) {
+		$dt = $value_defaults[ $i - 1 ][0];
+		$dx = $value_defaults[ $i - 1 ][1];
+		printf(
+			'<p><input type="text" class="widefat" name="beauty_about[value_%1$d_title]" value="%2$s"><br><textarea class="widefat" rows="2" name="beauty_about[value_%1$d_text]">%3$s</textarea></p>',
+			$i,
+			esc_attr( $f( 'value_' . $i . '_title', $dt ) ),
+			esc_textarea( $f( 'value_' . $i . '_text', $dx ) )
+		);
+	}
+
+	echo '<p><strong>' . esc_html__( '3 ý kiến (nội dung / vai trò)', 'sos-beauty' ) . '</strong></p>';
+	$quote_defaults = array(
+		array( 'Mình biết đến JP Bùi Đặng qua một người bạn giới thiệu và đến nay đã sử dụng sản phẩm hơn một năm. Nguồn gốc rõ ràng, chất lượng ổn định, đúng như mô tả — từ serum, mặt nạ đến chăm sóc cá nhân.', 'Người tiêu dùng' ),
+		array( 'Mình khá kỹ tính khi chọn nơi mua hàng nội địa Nhật. Sau nhiều lần trải nghiệm, JP Bùi Đặng là đơn vị khiến mình tin tưởng nhất — sản phẩm chính hãng, tư vấn am hiểu, luôn gợi ý đúng nhu cầu.', 'Người yêu mỹ phẩm Nhật' ),
+		array( 'Chúng tôi hợp tác nhiều năm và đánh giá cao sự chuyên nghiệp. Nguồn hàng ổn định, chính sách minh bạch, xử lý đơn nhanh — giúp chủ động kinh doanh và giữ niềm tin với khách hàng.', 'Đại lý phân phối' ),
+	);
+	for ( $i = 1; $i <= 3; $i++ ) {
+		$dq = $quote_defaults[ $i - 1 ][0];
+		$dr = $quote_defaults[ $i - 1 ][1];
+		printf(
+			'<p><textarea class="widefat" rows="3" name="beauty_about[quote_%1$d_text]">%2$s</textarea><br><input type="text" class="widefat" name="beauty_about[quote_%1$d_role]" value="%3$s"></p>',
+			$i,
+			esc_textarea( $f( 'quote_' . $i . '_text', $dq ) ),
+			esc_attr( $f( 'quote_' . $i . '_role', $dr ) )
+		);
+	}
+}
+
+function sos_beauty_about_metabox_save( $post_id ) {
+	if ( ! isset( $_POST['sos_beauty_about_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['sos_beauty_about_nonce'] ) ), 'sos_beauty_about_save' ) ) {
+		return;
+	}
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		return;
+	}
+	$post = get_post( $post_id );
+	if ( ! $post || 'gioi-thieu' !== $post->post_name ) {
+		return;
+	}
+	if ( empty( $_POST['beauty_about'] ) || ! is_array( $_POST['beauty_about'] ) ) {
+		return;
+	}
+	$raw = wp_unslash( $_POST['beauty_about'] );
+	foreach ( $raw as $key => $val ) {
+		$key = sanitize_key( $key );
+		if ( ! is_string( $val ) ) {
+			continue;
+		}
+		if ( false !== strpos( $key, 'text' ) ) {
+			update_post_meta( $post_id, '_beauty_about_' . $key, sanitize_textarea_field( $val ) );
+		} else {
+			update_post_meta( $post_id, '_beauty_about_' . $key, sanitize_text_field( $val ) );
+		}
+	}
+}
+add_action( 'save_post_page', 'sos_beauty_about_metabox_save' );
 
 /**
  * Body class for contact page styling hooks.

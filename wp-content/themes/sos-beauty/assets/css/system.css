@@ -466,15 +466,5 @@ textarea.jp-input:focus,
 
 .jp-section__body,
 .beauty-section__body {
-  align-items: stretch;
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: minmax(220px, 1fr) 3.4fr;
-}
-
-@media (max-width: 1024px) {
-  .jp-section__body,
-  .beauty-section__body {
-    grid-template-columns: 1fr;
-  }
+  display: block;
 }

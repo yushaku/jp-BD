@@ -27,12 +27,6 @@ do_action( 'storefront_before_content' );
 			<main id="main" class="site-main" role="main">
 
 				<?php
-				// Breadcrumb
-				if ( function_exists( 'woocommerce_breadcrumb' ) ) {
-					woocommerce_breadcrumb();
-				}
-
-				// Post content
 				while ( have_posts() ) :
 					the_post();
 
