@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SOS_BEAUTY_VERSION', '1.11.42' );
+define( 'SOS_BEAUTY_VERSION', '1.11.45' );
 
 /**
  * Brand logo / favicon paths (theme assets).
@@ -723,6 +723,99 @@ function sos_beauty_promo_customize( $wp_customize ) {
 	}
 }
 add_action( 'customize_register', 'sos_beauty_promo_customize' );
+
+/**
+ * Customizer: exclusive products banner on homepage.
+ */
+function sos_beauty_exclusive_banner_customize( $wp_customize ) {
+	$wp_customize->add_section(
+		'sos_beauty_exclusive_banner',
+		array(
+			'title'       => __( 'JP Bùi Đặng — Banner độc quyền', 'sos-beauty' ),
+			'description' => __( 'Banner phía trên mục Sản phẩm độc quyền trên trang chủ.', 'sos-beauty' ),
+			'priority'    => 33,
+		)
+	);
+
+	$wp_customize->add_setting(
+		'sos_beauty_exclusive_banner_show',
+		array(
+			'default'           => true,
+			'sanitize_callback' => function ( $v ) {
+				return (bool) $v;
+			},
+		)
+	);
+	$wp_customize->add_control(
+		'sos_beauty_exclusive_banner_show',
+		array(
+			'label'   => __( 'Hiện banner độc quyền', 'sos-beauty' ),
+			'section' => 'sos_beauty_exclusive_banner',
+			'type'    => 'checkbox',
+		)
+	);
+
+	$fields = array(
+		'sos_beauty_exclusive_banner_eyebrow'  => array(
+			'default' => 'Độc quyền tại JP',
+			'label'   => 'Eyebrow',
+		),
+		'sos_beauty_exclusive_banner_title'    => array(
+			'default' => 'fractional CC',
+			'label'   => 'Tiêu đề',
+		),
+		'sos_beauty_exclusive_banner_subtitle' => array(
+			'default' => 'Skincare Nhật Bản — chỉ có tại JP Bùi Đặng',
+			'label'   => 'Mô tả',
+		),
+		'sos_beauty_exclusive_banner_href'     => array(
+			'default' => '#beauty-exclusive',
+			'label'   => 'Link (vd. #beauty-exclusive hoặc /shop)',
+		),
+		'sos_beauty_exclusive_banner_alt'      => array(
+			'default' => 'Sản phẩm độc quyền fractional CC',
+			'label'   => 'Alt ảnh',
+		),
+	);
+
+	foreach ( $fields as $id => $field ) {
+		$wp_customize->add_setting(
+			$id,
+			array(
+				'default'           => $field['default'],
+				'sanitize_callback' => 'sanitize_text_field',
+			)
+		);
+		$wp_customize->add_control(
+			$id,
+			array(
+				'label'   => $field['label'],
+				'section' => 'sos_beauty_exclusive_banner',
+				'type'    => 'text',
+			)
+		);
+	}
+
+	$wp_customize->add_setting(
+		'sos_beauty_exclusive_banner_image',
+		array(
+			'default'           => 0,
+			'sanitize_callback' => 'absint',
+		)
+	);
+	$wp_customize->add_control(
+		new WP_Customize_Media_Control(
+			$wp_customize,
+			'sos_beauty_exclusive_banner_image',
+			array(
+				'label'     => __( 'Ảnh banner', 'sos-beauty' ),
+				'section'   => 'sos_beauty_exclusive_banner',
+				'mime_type' => 'image',
+			)
+		)
+	);
+}
+add_action( 'customize_register', 'sos_beauty_exclusive_banner_customize' );
 
 /**
  * Helper: get shop category link by slug.

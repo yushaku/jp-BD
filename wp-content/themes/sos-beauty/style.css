@@ -2,7 +2,7 @@
 Theme Name: JP Bùi Đặng
 Template: storefront
 Description: Thực phẩm, mỹ phẩm & TPCN chính hãng Nhật Bản. Palette ultra minimal (navy + neutrals).
-Version: 1.11.42
+Version: 1.11.45
 Text Domain: sos-beauty
 */
 
@@ -616,6 +616,110 @@ h1, h2, h3, h4, h5, h6,
 @media (max-width: 640px) {
   .beauty-hero-banner {
     margin-bottom: var(--jp-space-md);
+  }
+}
+
+/* Exclusive products banner (Customizer) */
+.beauty-exclusive-banner {
+  margin: 0 0 var(--jp-space-lg);
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.beauty-exclusive-banner__link {
+  display: block;
+  line-height: 0;
+  position: relative;
+  text-decoration: none;
+}
+
+.beauty-exclusive-banner__img {
+  display: block;
+  height: auto;
+  max-height: min(68vh, 560px);
+  object-fit: cover;
+  object-position: center 35%;
+  width: 100%;
+}
+
+.beauty-exclusive-banner__overlay {
+  background: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0.88) 0%,
+    rgba(255, 255, 255, 0.55) 38%,
+    rgba(255, 255, 255, 0) 62%
+  );
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.beauty-exclusive-banner__content {
+  align-items: flex-start;
+  color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+  left: 0;
+  max-width: min(28rem, 52%);
+  padding: clamp(1.25rem, 4vw, 2.75rem);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.beauty-exclusive-banner__eyebrow {
+  font-family: var(--jp-font-body, inherit);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.beauty-exclusive-banner__title {
+  font-family: var(--jp-font-display, inherit);
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.beauty-exclusive-banner__subtitle {
+  font-size: clamp(0.9rem, 1.6vw, 1.05rem);
+  line-height: 1.45;
+  max-width: 22rem;
+  opacity: 0.85;
+}
+
+@media (max-width: 640px) {
+  .beauty-exclusive-banner__img {
+    max-height: 52vh;
+    object-position: center 40%;
+  }
+
+  .beauty-exclusive-banner__overlay {
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.92) 0%,
+      rgba(255, 255, 255, 0.7) 42%,
+      rgba(255, 255, 255, 0.15) 100%
+    );
+  }
+
+  .beauty-exclusive-banner__content {
+    bottom: auto;
+    justify-content: flex-start;
+    max-width: 100%;
+    padding: 1.25rem 1rem 1.5rem;
+    top: 0;
+  }
+
+  .beauty-exclusive-banner__title {
+    font-size: 1.5rem;
   }
 }
 

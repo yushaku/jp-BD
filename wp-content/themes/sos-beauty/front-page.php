@@ -40,15 +40,6 @@ $categories = array(
 
 $sections = array(
 	array(
-		'class'       => 'beauty-section--exclusive',
-		'eyebrow'     => __( 'Chỉ có tại JP', 'sos-beauty' ),
-		'title'       => __( 'Sản phẩm độc quyền', 'sos-beauty' ),
-		'desc'        => __( 'Hàng chọn lọc, không bán đại trà', 'sos-beauty' ),
-		'more_url'    => $shop_url,
-		'shortcode'   => '[products limit="8" columns="4" exclusive="yes" orderby="date"]',
-		'require_meta'=> '_sos_exclusive',
-	),
-	array(
 		'class'       => '',
 		'eyebrow'     => __( 'Bán chạy nhất', 'sos-beauty' ),
 		'title'       => __( 'Sản phẩm nổi bật', 'sos-beauty' ),
@@ -121,24 +112,45 @@ $trust_items = array(
 	<?php endforeach; ?>
 </nav>
 
+<?php
+$exclusive_has_products = (bool) get_posts(
+	array(
+		'post_type'      => 'product',
+		'post_status'    => 'publish',
+		'posts_per_page' => 1,
+		'fields'         => 'ids',
+		'meta_key'       => '_sos_exclusive',
+		'meta_value'     => 'yes',
+	)
+);
+$exclusive_banner_on = (bool) get_theme_mod( 'sos_beauty_exclusive_banner_show', true );
+?>
+
+<?php if ( $exclusive_banner_on || $exclusive_has_products ) : ?>
+	<section id="beauty-exclusive" class="beauty-section beauty-section--exclusive">
+		<header class="beauty-section__header">
+			<div class="beauty-section__heading">
+				<p class="beauty-section__eyebrow"><?php esc_html_e( 'Chỉ có tại JP', 'sos-beauty' ); ?></p>
+				<h2 class="beauty-section__title"><?php esc_html_e( 'Sản phẩm độc quyền', 'sos-beauty' ); ?></h2>
+			</div>
+			<?php if ( $exclusive_has_products ) : ?>
+				<a class="beauty-section__more" href="<?php echo esc_url( $shop_url ); ?>"><?php esc_html_e( 'Xem tất cả', 'sos-beauty' ); ?></a>
+			<?php endif; ?>
+		</header>
+
+		<?php get_template_part( 'template-parts/exclusive-banner' ); ?>
+
+		<?php if ( $exclusive_has_products ) : ?>
+			<div class="beauty-section__body">
+				<div class="beauty-section__products">
+					<?php echo do_shortcode( '[products limit="8" columns="4" exclusive="yes" orderby="date"]' ); ?>
+				</div>
+			</div>
+		<?php endif; ?>
+	</section>
+<?php endif; ?>
+
 <?php foreach ( $sections as $section ) : ?>
-	<?php
-	if ( ! empty( $section['require_meta'] ) ) {
-		$has_exclusive = get_posts(
-			array(
-				'post_type'      => 'product',
-				'post_status'    => 'publish',
-				'posts_per_page' => 1,
-				'fields'         => 'ids',
-				'meta_key'       => $section['require_meta'],
-				'meta_value'     => 'yes',
-			)
-		);
-		if ( empty( $has_exclusive ) ) {
-			continue;
-		}
-	}
-	?>
 	<section class="beauty-section <?php echo esc_attr( $section['class'] ); ?>">
 		<header class="beauty-section__header">
 			<div class="beauty-section__heading">
