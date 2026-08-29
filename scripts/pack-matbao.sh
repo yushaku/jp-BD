@@ -90,9 +90,9 @@ Plan chi tiết: docs/matbao-deploy-plan.md
    cd ~
    unzip -o matbao-seed.zip -d .
 
-   # theme
+   # theme (cp -a: Plesk web terminal không có rsync)
    mkdir -p ~/httpdocs/wp-content/themes/sos-beauty
-   rsync -a matbao-seed/wp-content/themes/sos-beauty/ ~/httpdocs/wp-content/themes/sos-beauty/
+   cp -a matbao-seed/wp-content/themes/sos-beauty/. ~/httpdocs/wp-content/themes/sos-beauty/
 
    # scripts
    cp matbao-seed/setup-matbao.sh ~/
@@ -101,7 +101,7 @@ Plan chi tiết: docs/matbao-deploy-plan.md
 
    # ảnh sản phẩm
    mkdir -p ~/products
-   rsync -a matbao-seed/products/ ~/products/
+   cp -a matbao-seed/products/. ~/products/
 
 3. Backup trước khi setup:
 

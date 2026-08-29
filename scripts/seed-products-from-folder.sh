@@ -187,9 +187,35 @@ title_exists() {
   return 1
 }
 
+# Import ≤3 images from folder → featured + gallery. Echo count.
+attach_folder_images() {
+  local pid="$1" folder="$2" name="$3"
+  local -a img_ids=()
+  local img aid i=0
+  while IFS= read -r img; do
+    i=$((i + 1))
+    aid=$($WP media import "$img" --title="${name} — ảnh ${i}" --porcelain 2>/dev/null || true)
+    if [ -n "$aid" ]; then
+      img_ids+=("$aid")
+    fi
+  done < <(first_images "$folder" 3 || true)
+
+  if [ ${#img_ids[@]} -eq 0 ]; then
+    echo 0
+    return
+  fi
+  $WP post meta update "$pid" _thumbnail_id "${img_ids[0]}" >/dev/null 2>&1 || true
+  if [ ${#img_ids[@]} -gt 1 ]; then
+    local gallery
+    gallery=$(IFS=,; echo "${img_ids[*]:1}")
+    $WP post meta update "$pid" _product_image_gallery "$gallery" >/dev/null 2>&1 || true
+  fi
+  echo "${#img_ids[@]}"
+}
+
 create_one() {
   local needle="$1" name="$2" cat_slug="$3" brand="$4" price="$5" stock="$6" sale="${7:-}" slug_fixed="${8:-}"
-  local folder slug existing cat_id pid short desc
+  local folder slug existing cat_id pid short desc thumb nimg
   if [ -d "$needle" ]; then
     folder="${needle%/}"
   else
@@ -209,7 +235,13 @@ create_one() {
 
   existing=$($WP post list --post_type=product --name="$slug" --field=ID 2>/dev/null | head -1 || true)
   if [ -n "$existing" ]; then
-    log "SKIP exists: $name (#$existing)"
+    thumb=$($WP post meta get "$existing" _thumbnail_id 2>/dev/null || true)
+    if [ -n "$thumb" ] && [ "$thumb" != "0" ]; then
+      log "SKIP exists: $name (#$existing)"
+      return
+    fi
+    nimg=$(attach_folder_images "$existing" "$folder" "$name")
+    log "FILL #$existing $name imgs=$nimg"
     return
   fi
   if title_exists "$name"; then
@@ -256,26 +288,8 @@ create_one() {
   $WP post meta update "$pid" _sos_how_to_use "Làm sạch vùng dùng, lấy lượng vừa đủ, thoa đều. 1–2 lần/ngày hoặc theo bao bì." >/dev/null 2>&1 || true
   $WP post meta update "$pid" _sos_brand "$brand" >/dev/null 2>&1 || true
 
-  local -a img_ids=()
-  local img aid i=0
-  while IFS= read -r img; do
-    i=$((i + 1))
-    aid=$($WP media import "$img" --title="${name} — ảnh ${i}" --porcelain 2>/dev/null || true)
-    if [ -n "$aid" ]; then
-      img_ids+=("$aid")
-    fi
-  done < <(first_images "$folder" 3 || true)
-
-  if [ ${#img_ids[@]} -gt 0 ]; then
-    $WP post meta update "$pid" _thumbnail_id "${img_ids[0]}" >/dev/null 2>&1 || true
-    if [ ${#img_ids[@]} -gt 1 ]; then
-      local gallery
-      gallery=$(IFS=,; echo "${img_ids[*]:1}")
-      $WP post meta update "$pid" _product_image_gallery "$gallery" >/dev/null 2>&1 || true
-    fi
-  fi
-
-  log "OK #$pid $name ($cat_slug) imgs=${#img_ids[@]}"
+  nimg=$(attach_folder_images "$pid" "$folder" "$name")
+  log "OK #$pid $name ($cat_slug) imgs=$nimg"
 }
 
 guess_cat() {

@@ -18,6 +18,7 @@
 - [ ] Click **Get it free**
 
 **Verify:**
+
 ```bash
 curl -I https://jpbuidang.vn
 # → HTTP/2 200 (không lỗi cert)
@@ -52,6 +53,7 @@ wp search-replace 'http://jpbuidang.vn' 'https://jpbuidang.vn' --all-tables --pr
 ```
 
 **Verify:**
+
 ```bash
 curl -sI http://jpbuidang.vn | grep -i location
 # → Location: https://jpbuidang.vn/
@@ -63,18 +65,18 @@ curl -sI http://jpbuidang.vn | grep -i location
 
 ### Desktop
 
-| Trang | URL | Check |
-|-------|-----|-------|
-| Trang chủ | `https://jpbuidang.vn` | Hero + promo sections + products |
-| Shop | `/shop` | Grid products có ảnh + giá VND |
-| Product detail | `/product/serum-cam` | Layout PDP mới: ảnh gallery, giá, nút thêm giỏ, trust badges, related |
-| Danh mục | `/product-category/serum` | Filter đúng |
-| Blog | `/blog` hoặc `/?post_type=post` | List posts |
-| Blog detail | `/<slug-bai-viet>` | Featured image lớn, typography, author bio, related posts |
-| Giới thiệu | `/gioi-thieu` | Content page |
-| Liên hệ | `/lien-he` | Form + info |
-| Cart | `/cart` | Empty state OK |
-| Checkout | `/checkout` | Form VND, COD + Bank transfer |
+| Trang          | URL                             | Check                                                                 |
+| -------------- | ------------------------------- | --------------------------------------------------------------------- |
+| Trang chủ      | `https://jpbuidang.vn`          | Hero + promo sections + products                                      |
+| Shop           | `/shop`                         | Grid products có ảnh + giá VND                                        |
+| Product detail | `/product/serum-cam`            | Layout PDP mới: ảnh gallery, giá, nút thêm giỏ, trust badges, related |
+| Danh mục       | `/product-category/serum`       | Filter đúng                                                           |
+| Blog           | `/blog` hoặc `/?post_type=post` | List posts                                                            |
+| Blog detail    | `/<slug-bai-viet>`              | Featured image lớn, typography, author bio, related posts             |
+| Giới thiệu     | `/gioi-thieu`                   | Content page                                                          |
+| Liên hệ        | `/lien-he`                      | Form + info                                                           |
+| Cart           | `/cart`                         | Empty state OK                                                        |
+| Checkout       | `/checkout`                     | Form VND, COD + Bank transfer                                         |
 
 ### Mobile (DevTools responsive hoặc điện thoại thật)
 
@@ -165,6 +167,7 @@ du -sh ~/httpdocs
 ## ✅ Checklist Phase 6 (Definition of Done)
 
 ### Kỹ thuật
+
 - [ ] HTTPS xanh, không mixed content warning
 - [ ] HTTP → HTTPS redirect 301
 - [ ] `wp core verify-checksums` pass
@@ -173,6 +176,7 @@ du -sh ~/httpdocs
 - [ ] `blog_public = 1` (cho phép index)
 
 ### Nội dung
+
 - [ ] Trang chủ load đủ sections
 - [ ] Shop hiện ≥40 products có ảnh
 - [ ] Product detail UI mới hoạt động
@@ -181,6 +185,7 @@ du -sh ~/httpdocs
 - [ ] Pages Giới thiệu / Liên hệ có content
 
 ### E-commerce
+
 - [ ] Giá hiển thị `1.000 ₫` (VND, 0 decimal)
 - [ ] Add to cart hoạt động
 - [ ] Checkout form OK
@@ -188,6 +193,7 @@ du -sh ~/httpdocs
 - [ ] Test order thành công
 
 ### Responsive
+
 - [ ] Mobile 375px OK
 - [ ] Tablet 768px OK
 - [ ] Desktop 1440px OK

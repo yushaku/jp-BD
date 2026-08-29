@@ -64,7 +64,33 @@ sync_urls() {
   $WP option update home "$URL"
   $WP option update blogname "$SITE_TITLE"
   $WP rewrite structure '/%postname%/' --hard 2>/dev/null || $WP rewrite structure '/%postname%/'
+  write_htaccess
   $WP language core install vi --activate 2>/dev/null || $WP site switch-language vi 2>/dev/null || true
+}
+
+# Plesk nginx/PHP-FPM often skips writing .htaccess on rewrite --hard.
+write_htaccess() {
+  local ht="$ROOT/.htaccess"
+  if grep -q 'BEGIN WordPress' "$ht" 2>/dev/null; then
+    log ".htaccess already has WordPress rules"
+    return
+  fi
+  cat >> "$ht" << 'EOF'
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+# END WordPress
+EOF
+  chmod 644 "$ht" 2>/dev/null || true
+  log "Wrote WordPress rewrite rules → $ht"
 }
 
 install_plugins_and_theme() {

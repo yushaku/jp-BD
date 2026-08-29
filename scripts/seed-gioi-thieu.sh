@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Create / update WordPress page "Giới thiệu" (slug: gioi-thieu).
-# Layout is the theme template page-gioi-thieu.php — this script ensures the page,
-# SEO excerpt, and Main Menu item exist.
+# Layout from page-gioi-thieu.php. Title / excerpt / content / featured image + metabox
+# are editable in WP admin → Pages → Giới thiệu.
 #
 # Local Docker:
 #   docker compose --profile cli run --rm --entrypoint bash wpcli /scripts/seed-gioi-thieu.sh
