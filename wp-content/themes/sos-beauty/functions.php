@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SOS_BEAUTY_VERSION', '1.11.63' );
+define( 'SOS_BEAUTY_VERSION', '1.11.75' );
 
 require_once get_stylesheet_directory() . '/inc/company.php';
 
@@ -1951,6 +1951,7 @@ add_filter( 'excerpt_more', 'sos_beauty_news_excerpt_more' );
  */
 function sos_beauty_remove_default_footer_widgets() {
 	remove_action( 'storefront_footer', 'storefront_footer_widgets', 10 );
+	remove_action( 'storefront_footer', 'storefront_handheld_footer_bar', 999 );
 }
 add_action( 'init', 'sos_beauty_remove_default_footer_widgets' );
 

@@ -2,7 +2,7 @@
 Theme Name: JP Bùi Đặng
 Template: storefront
 Description: Thực phẩm, mỹ phẩm & TPCN chính hãng Nhật Bản. Palette ultra minimal (navy + neutrals).
-Version: 1.11.63
+Version: 1.11.75
 Text Domain: sos-beauty
 */
 
@@ -1594,7 +1594,7 @@ ul.products::after {
   --pdp-gap: 2.5rem;
   margin: 0 auto;
   max-width: var(--jp-container);
-  padding: var(--jp-space-lg) var(--jp-gutter);
+  padding: 0;
 }
 
 .beauty-pdp__grid {
@@ -1851,6 +1851,10 @@ ul.products::after {
   width: 100% !important;
 }
 
+.beauty-pdp-tab-heading {
+  display: none;
+}
+
 .beauty-pdp__tabs #reviews.woocommerce-Reviews {
   color: var(--jp-ink);
   font-family: var(--font-body);
@@ -1888,7 +1892,7 @@ ul.products::after {
   background: var(--jp-surface);
   border: 1px solid var(--jp-border);
   border-radius: var(--jp-radius-card);
-  padding: 1.5rem 1.35rem 1.35rem;
+  padding: 0;
 }
 
 .beauty-pdp__tabs #review_form label {
@@ -2007,7 +2011,65 @@ ul.products::after {
 
   .beauty-pdp {
     --pdp-gap: 1.5rem;
-    padding: var(--jp-space-md);
+    padding: 0;
+  }
+
+  .beauty-pdp__trust {
+    gap: 0.45rem 0.65rem;
+  }
+
+  .beauty-pdp__trust-item {
+    font-size: 0.72rem;
+    gap: 0.3rem;
+  }
+
+  .beauty-pdp__trust-icon svg {
+    height: 14px;
+    width: 14px;
+  }
+
+  /* PDP tabs → stacked scroll sections */
+  .beauty-pdp__tabs .woocommerce-tabs ul.tabs.wc-tabs {
+    display: none !important;
+  }
+
+  .beauty-pdp__tabs .woocommerce-tabs.wc-tabs-wrapper {
+    gap: 1.5rem;
+  }
+
+  .beauty-pdp__tabs .woocommerce-Tabs-panel.panel,
+  .beauty-pdp__tabs .woocommerce-Tabs-panel {
+    border-top: 1px solid var(--jp-border);
+    display: block !important;
+    margin: 0;
+    opacity: 1 !important;
+    padding: 1.25rem 0 0;
+    visibility: visible !important;
+  }
+
+  .beauty-pdp__tabs .woocommerce-Tabs-panel:first-of-type {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .beauty-pdp-tab-heading {
+    color: var(--jp-ink);
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    margin: 0 0 0.75rem;
+  }
+
+  /* Hide WooCommerce duplicate panel titles */
+  .beauty-pdp-tab-heading + h2,
+  .beauty-pdp__tabs .woocommerce-Tabs-panel--description > h2:not(.beauty-pdp-tab-heading),
+  .beauty-pdp__tabs .woocommerce-Tabs-panel--reviews .woocommerce-Reviews-title,
+  .beauty-pdp__tabs #reviews .woocommerce-Reviews-title,
+  .beauty-pdp__tabs #comments > .woocommerce-Reviews-title {
+    display: none !important;
   }
 }
 
@@ -2487,6 +2549,28 @@ ul.products::after {
   opacity: 0.85;
 }
 
+@media (max-width: 768px) {
+  .storefront-breadcrumb .col-full {
+    padding-bottom: 0.4rem;
+    padding-top: 0.4rem;
+  }
+
+  .woocommerce-breadcrumb {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.35;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .woocommerce-breadcrumb .breadcrumb-separator {
+    margin: 0 0.15em;
+  }
+}
+
 .site-content,
 #content {
   min-height: 100dvh;
@@ -2579,6 +2663,7 @@ ul.products::after {
   gap: 0.85rem;
 }
 
+.woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row,
 .woocommerce-cart .wc-block-cart-items__row {
   align-items: center;
   background: var(--jp-surface);
@@ -2589,6 +2674,36 @@ ul.products::after {
   gap: 0.85rem 1rem;
   grid-template-columns: 5.5rem minmax(0, 1fr) auto;
   padding: 1rem 1.1rem;
+}
+
+/* Beat WC default spans so total keeps its own column */
+.woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__image,
+.woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__product,
+.woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__total,
+.woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__quantity {
+  grid-column: auto;
+  grid-row: auto;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+.woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__image {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__product {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: stretch;
+  min-width: 0;
+}
+
+.woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__total {
+  align-self: center;
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
 }
 
 .woocommerce-cart .wc-block-cart-item__image,
@@ -2851,9 +2966,85 @@ ul.products::after {
   color: #fff !important;
 }
 
+/* WC sets .is-small/.is-medium/.is-mobile by container width — not viewport */
+.woocommerce-cart .is-small table.wc-block-cart-items .wc-block-cart-items__row,
+.woocommerce-cart .is-medium table.wc-block-cart-items .wc-block-cart-items__row,
+.woocommerce-cart .is-mobile table.wc-block-cart-items .wc-block-cart-items__row {
+  align-items: start;
+  gap: 0.65rem 0.85rem;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  grid-template-areas:
+    "image product"
+    "total total";
+  padding: 0.9rem;
+}
+
+.woocommerce-cart .is-small table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__image,
+.woocommerce-cart .is-medium table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__image,
+.woocommerce-cart .is-mobile table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__image {
+  grid-area: image;
+  grid-column: image;
+  grid-row: image;
+  padding-right: 0;
+}
+
+.woocommerce-cart .is-small table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__image img,
+.woocommerce-cart .is-medium table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__image img,
+.woocommerce-cart .is-mobile table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__image img {
+  height: 4.5rem;
+  width: 4.5rem;
+}
+
+.woocommerce-cart .is-small table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__product,
+.woocommerce-cart .is-medium table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__product,
+.woocommerce-cart .is-mobile table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__product {
+  grid-area: product;
+  grid-column: product;
+  grid-row: product;
+  min-width: 0;
+}
+
+.woocommerce-cart .is-small table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__quantity,
+.woocommerce-cart .is-medium table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__quantity,
+.woocommerce-cart .is-mobile table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__quantity {
+  grid-column: auto;
+  grid-row: auto;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+.woocommerce-cart .is-small table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__total,
+.woocommerce-cart .is-medium table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__total,
+.woocommerce-cart .is-mobile table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__total {
+  align-items: center;
+  display: flex;
+  grid-area: total;
+  grid-column: total;
+  grid-row: total;
+  justify-content: flex-end;
+  justify-self: stretch;
+  padding-top: 0.15rem;
+  text-align: right;
+  width: 100%;
+}
+
+.woocommerce-cart .is-small .wc-block-cart-item__total-price-and-sale-badge-wrapper,
+.woocommerce-cart .is-medium .wc-block-cart-item__total-price-and-sale-badge-wrapper,
+.woocommerce-cart .is-mobile .wc-block-cart-item__total-price-and-sale-badge-wrapper {
+  align-items: flex-end;
+  width: 100%;
+}
+
 @media (max-width: 640px) {
+  .woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row,
   .woocommerce-cart .wc-block-cart-items__row {
+    align-items: start;
+    gap: 0.65rem 0.85rem;
     grid-template-columns: 4.5rem minmax(0, 1fr);
+    grid-template-areas:
+      "image product"
+      "total total";
+    padding: 0.9rem;
   }
 
   .woocommerce-cart .wc-block-cart-item__image img {
@@ -2861,8 +3052,20 @@ ul.products::after {
     width: 4.5rem;
   }
 
-  .woocommerce-cart .wc-block-cart-item__total {
-    grid-column: 1 / -1;
+  .woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__image {
+    grid-area: image;
+  }
+
+  .woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__product {
+    grid-area: product;
+  }
+
+  .woocommerce-cart .wc-block-cart table.wc-block-cart-items .wc-block-cart-items__row .wc-block-cart-item__total {
+    align-items: center;
+    display: flex;
+    grid-area: total;
+    justify-content: flex-end;
+    width: 100%;
   }
 }
 
@@ -3447,6 +3650,10 @@ ul.products::after {
   color: var(--jp-footer-text);
   margin-top: 3rem;
   padding-top: var(--jp-space-xl);
+}
+
+.storefront-handheld-footer-bar {
+  display: none !important;
 }
 
 /* Beat Storefront global link color on soft footer */
@@ -4969,7 +5176,7 @@ a.beauty-contact__channel-value:hover {
 .beauty-single-post__container {
   margin: 0 auto;
   max-width: var(--jp-container);
-  padding: 0 var(--jp-gutter);
+  padding: 0;
   width: 100%;
   box-sizing: border-box;
 }
@@ -5458,6 +5665,285 @@ a.beauty-contact__channel-value:hover {
   padding: 0.4rem 1.1rem 1.1rem;
 }
 
+/* Comments */
+.beauty-single-post #comments.comments-area {
+  border-top: 1px solid var(--jp-border);
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+}
+
+.beauty-single-post .comments-title {
+  color: var(--jp-ink);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.25rem;
+}
+
+.beauty-single-post .comments-title span {
+  color: var(--jp-muted);
+  font-weight: 500;
+}
+
+.beauty-single-post .comment-list {
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+}
+
+.beauty-single-post .comment-list .children {
+  list-style: none;
+  margin: 0.85rem 0 0 1.25rem;
+  padding: 0;
+}
+
+.beauty-single-post .comment-list > .comment,
+.beauty-single-post .comment-list .children > .comment {
+  margin: 0 0 0.85rem;
+}
+
+.beauty-single-post .comment-body {
+  background: var(--jp-paper);
+  border: 1px solid var(--jp-border);
+  border-radius: var(--jp-radius-card);
+  padding: 1.15rem 1.2rem 1.1rem;
+}
+
+.beauty-single-post .comment-meta.commentmetadata {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.85rem;
+  justify-content: space-between;
+  margin: 0 0 0.85rem;
+}
+
+.beauty-single-post .comment-author.vcard {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.beauty-single-post .comment-author .avatar {
+  border-radius: 50%;
+  display: block;
+  flex-shrink: 0;
+  height: 44px;
+  object-fit: cover;
+  width: 44px;
+}
+
+.beauty-single-post .comment-author .fn {
+  color: var(--jp-ink);
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.beauty-single-post .comment-author .fn a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.beauty-single-post .comment-author .fn a:hover {
+  color: var(--jp-primary);
+}
+
+.beauty-single-post .comment-date {
+  color: var(--jp-muted);
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-top: 0.15rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.beauty-single-post .comment-date:hover {
+  color: var(--jp-primary);
+}
+
+.beauty-single-post .comment-content {
+  min-width: 0;
+}
+
+.beauty-single-post .comment-text {
+  color: var(--jp-ink);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.beauty-single-post .comment-text p {
+  margin: 0 0 0.75rem;
+}
+
+.beauty-single-post .comment-text p:last-child {
+  margin-bottom: 0;
+}
+
+.beauty-single-post .comment-text a {
+  color: var(--jp-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.beauty-single-post .reply {
+  margin-top: 0.85rem;
+}
+
+.beauty-single-post .comment-reply-link {
+  align-items: center;
+  background: #fff;
+  border: 1px solid var(--jp-border);
+  border-radius: 999px;
+  color: var(--jp-ink);
+  display: inline-flex;
+  font-size: 0.78rem;
+  font-weight: 600;
+  gap: 0.3rem;
+  min-height: 32px;
+  padding: 0.25rem 0.85rem;
+  text-decoration: none;
+  transition:
+    background var(--jp-duration) var(--jp-ease),
+    border-color var(--jp-duration) var(--jp-ease),
+    color var(--jp-duration) var(--jp-ease);
+}
+
+.beauty-single-post .comment-reply-link:hover {
+  background: var(--jp-primary);
+  border-color: var(--jp-primary);
+  color: #fff;
+}
+
+.beauty-single-post #respond.comment-respond {
+  background: var(--jp-surface);
+  border: 1px solid var(--jp-border);
+  border-radius: var(--jp-radius-card);
+  margin-top: 0.5rem;
+  padding: 1.35rem 1.25rem 1.25rem;
+}
+
+.beauty-single-post .comment-reply-title,
+.beauty-single-post #respond #reply-title {
+  color: var(--jp-ink);
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+}
+
+.beauty-single-post .comment-reply-title small a,
+.beauty-single-post #respond #reply-title small a {
+  color: var(--jp-muted);
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-left: 0.5rem;
+  text-decoration: none;
+}
+
+.beauty-single-post .comment-notes {
+  color: var(--jp-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.beauty-single-post .comment-form label {
+  color: var(--jp-ink);
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin: 0 0 0.4rem;
+}
+
+.beauty-single-post .comment-form .required {
+  color: var(--jp-primary);
+}
+
+.beauty-single-post .comment-form p {
+  margin: 0 0 1rem;
+}
+
+.beauty-single-post .comment-form input[type="text"],
+.beauty-single-post .comment-form input[type="email"],
+.beauty-single-post .comment-form input[type="url"],
+.beauty-single-post .comment-form textarea {
+  background: var(--jp-paper);
+  border: 1px solid var(--jp-border);
+  border-radius: var(--jp-radius);
+  color: var(--jp-ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.65rem 0.85rem;
+  width: 100%;
+}
+
+.beauty-single-post .comment-form input[type="text"]:focus,
+.beauty-single-post .comment-form input[type="email"]:focus,
+.beauty-single-post .comment-form input[type="url"]:focus,
+.beauty-single-post .comment-form textarea:focus {
+  border-color: var(--jp-primary);
+  box-shadow: var(--jp-focus-ring);
+  outline: none;
+}
+
+.beauty-single-post .comment-form textarea {
+  min-height: 7.5rem;
+  resize: vertical;
+}
+
+.beauty-single-post .comment-form-cookies-consent {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.beauty-single-post .comment-form-cookies-consent label {
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.beauty-single-post .comment-form-cookies-consent input[type="checkbox"] {
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+.beauty-single-post .form-submit {
+  margin: 0;
+}
+
+.beauty-single-post .form-submit input[type="submit"],
+.beauty-single-post .comment-form .submit {
+  background: var(--jp-primary);
+  border: 0;
+  border-radius: var(--jp-radius);
+  color: #fff;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-height: 44px;
+  padding: 0.65rem 1.25rem;
+  transition: background var(--jp-duration) var(--jp-ease);
+}
+
+.beauty-single-post .form-submit input[type="submit"]:hover,
+.beauty-single-post .comment-form .submit:hover {
+  background: var(--jp-primary-hover);
+}
+
 /* Responsive */
 @media (max-width: 900px) {
   .beauty-related__grid {
@@ -5488,6 +5974,32 @@ a.beauty-contact__channel-value:hover {
 
   .beauty-single__content {
     font-size: 1rem;
+  }
+
+  .beauty-single-post #comments.comments-area {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+  }
+
+  .beauty-single-post .comments-title {
+    font-size: 1.15rem;
+  }
+
+  .beauty-single-post .comment-body {
+    padding: 1rem;
+  }
+
+  .beauty-single-post .comment-author .avatar {
+    height: 36px;
+    width: 36px;
+  }
+
+  .beauty-single-post .comment-list .children {
+    margin-left: 0.75rem;
+  }
+
+  .beauty-single-post #respond.comment-respond {
+    padding: 1.1rem 1rem 1rem;
   }
 
   .beauty-single__content h2 {
@@ -5524,7 +6036,7 @@ a.beauty-contact__channel-value:hover {
 
 @media (max-width: 480px) {
   .beauty-single-post__container {
-    padding: 0 var(--jp-space-md);
+    padding: 0;
   }
 
   .beauty-single__header {

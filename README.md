@@ -121,54 +121,84 @@ docker compose down -v
 
 Child theme nằm tại `wp-content/themes/sos-beauty/` (mount vào container).
 
-| File                                   | Vai trò                                            |
-| -------------------------------------- | -------------------------------------------------- |
-| `assets/css/system.css`                | Design system: tokens + atoms `.jp-*`              |
-| `style.css`                            | Feature layout (header, promo, trust, Woo tweaks)  |
-| `front-page.php`                       | Promo grid, danh mục, sản phẩm, trust strip        |
-| `template-parts/promo-hero.php`        | Lưới ưu đãi (feature + countdown + 2 tile)         |
-| `functions.php`                        | Tab sản phẩm, Customizer, hooks WooCommerce        |
-| `woocommerce/content-product.php`      | Thẻ sản phẩm — thương hiệu trên archive            |
-| `woocommerce/single-product/title.php` | Hiển thị thương hiệu PDP                           |
+| File                                   | Vai trò                                           |
+| -------------------------------------- | ------------------------------------------------- |
+| `assets/css/system.css`                | Design system: tokens + atoms `.jp-*`             |
+| `style.css`                            | Feature layout (header, promo, trust, Woo tweaks) |
+| `front-page.php`                       | Promo grid, danh mục, sản phẩm, trust strip       |
+| `template-parts/promo-hero.php`        | Lưới ưu đãi (feature + countdown + 2 tile)        |
+| `functions.php`                        | Tab sản phẩm, Customizer, hooks WooCommerce       |
+| `woocommerce/content-product.php`      | Thẻ sản phẩm — thương hiệu trên archive           |
+| `woocommerce/single-product/title.php` | Hiển thị thương hiệu PDP                          |
 
 **Design system:** see [docs/design-system.md](docs/design-system.md). Atoms: `.jp-btn`, `.jp-card`, `.jp-section`, `.jp-badge`, `.jp-eyebrow`, `.jp-container`.
 
-**Palette:** `--jp-matcha` (accent), `--jp-matcha-text` / `--jp-gold` / `--jp-vermillion` (text+CTA, WCAG AA vs cream), `--jp-indigo` (footer bg). Text on footer: `--jp-footer-text` / `--jp-footer-muted` — no low-opacity body copy.
+**Palette:** `--jp-primary` / `--jp-indigo` (navy `#232d6c`), neutrals, footer soft `--jp-footer-bg` (`#eef0f5`) + `--jp-footer-text` / `--jp-footer-muted`.
 
 Chỉnh promo trang chủ: **Giao diện → Tùy chỉnh → JP Bùi Đặng Promo Hero** (ảnh, tiêu đề, CTA, countdown ISO 8601).
 
-Footer (địa chỉ, hotline, email, link BCT): **Giao diện → Tùy chỉnh → JP Bùi Đặng Footer**.
+Footer / liên hệ (địa chỉ, hotline, email, fanpage): const `SOS_BEAUTY_COMPANY` trong `inc/company.php` — Customizer **Giao diện → Tùy chỉnh → JP Bùi Đặng Footer** override được.
 
 Mục **JP Bùi Đặng Hero** (text) giữ cho tương thích — không còn hiển thị trên trang chủ.
 
-Kích hoạt lại theme:
+Kích hoạt lại theme (local):
 
 ```bash
 docker compose --profile cli run --rm --entrypoint wp wpcli --allow-root theme activate sos-beauty
+docker compose --profile cli run --rm --entrypoint wp wpcli --allow-root cache flush
 ```
+
+## Update theme lên Mắt Bão
+
+`https://jpbuidang.vn` · seed lần đầu: [docs/matbao-demo-setup.md](docs/matbao-demo-setup.md)
+
+**1. Mac**
+
+```bash
+cd /Users/nami/work/jp-hadang
+mkdir -p dist
+(cd wp-content/themes && zip -r ../../../dist/sos-beauty-theme.zip sos-beauty -x "*.DS_Store" -x "*/.git/*")
+```
+
+**2. Plesk Files** — upload `dist/sos-beauty-theme.zip` → `httpdocs/wp-content/themes/`
+
+**3. Plesk Terminal**
+
+```bash
+source ~/.bashrc
+cd ~/httpdocs/wp-content/themes && unzip -o sos-beauty-theme.zip
+cd ~/httpdocs && wp theme activate sos-beauty && wp cache flush
+```
+
+Hard-refresh site. `wp` lỗi → [docs/matbao-hosting.md](docs/matbao-hosting.md) (cài `wp-cli.phar` 1 lần).
 
 ## Cấu trúc repo
 
 ```
 ├── docker-compose.yml
 ├── .env.example
-├── wp-content/themes/sos-beauty/   # Child theme mỹ phẩm (commit được)
+├── wp-content/themes/sos-beauty/   # Child theme (commit)
 │   ├── style.css
-│   ├── assets/css/system.css       # Design tokens + .jp-* atoms
+│   ├── assets/css/system.css
 │   ├── functions.php
+│   ├── inc/company.php             # Contact shared const
 │   ├── front-page.php
 │   └── woocommerce/
 ├── docs/
-│   └── design-system.md            # Atom usage + token table
+│   ├── design-system.md
+│   ├── matbao-hosting.md           # Hosting Express
+│   ├── matbao-demo-setup.md        # Seed / setup demo
+│   └── matbao-deploy/              # Phase runbooks
 ├── scripts/
-│   ├── setup.sh              # Khởi tạo WP + WooCommerce
+│   ├── setup.sh
+│   ├── pack-matbao.sh              # Zip deploy Mắt Bão
+│   ├── setup-matbao.sh
 │   └── plugins/
-│       └── vnpay-woocommerce.zip   # (tự thêm) plugin VNPay
 └── README.md
 ```
 
 ## Mở rộng sau này
 
 - Tích hợp GHTK / GHN / Viettel Post (API vận chuyển)
-- Deploy production (nginx, SSL, backup tự động)
-- Theme trả phí (Kadence, Flatsome) hoặc custom theme
+- Backup tự động / staging
+- Theme trả phí (Kadence, Flatsome) hoặc mở rộng child theme

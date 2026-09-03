@@ -64,13 +64,22 @@ ssh -v han01938@sg-pl10.cloudnetwork.vn
 | System user | `jpb36793` |
 | Default `php` shell | ~7.2 — **không dùng** |
 | PHP dùng   | `/opt/plesk/php/8.2/bin/php` |
-| WP-CLI     | `/usr/local/bin/wp` |
-| `~/.bashrc` | `wp() { /opt/plesk/php/8.2/bin/php /usr/local/bin/wp "$@"; }` |
+| WP-CLI     | `~/httpdocs/wp-cli.phar` (không dùng `/usr/local/bin/wp` — WP Toolkit gãy) |
+| `~/.bashrc` | `wp() { /opt/plesk/php/8.2/bin/php "$HOME/httpdocs/wp-cli.phar" "$@"; }` |
 
 ```bash
 source ~/.bashrc
 cd ~/httpdocs
-wp core version   # → 7.0.4
+wp core version
+```
+
+Nếu chưa có phar:
+
+```bash
+curl -sL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o ~/httpdocs/wp-cli.phar
+chmod +x ~/httpdocs/wp-cli.phar
+echo 'wp() { /opt/plesk/php/8.2/bin/php "$HOME/httpdocs/wp-cli.phar" "$@"; }' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ---
