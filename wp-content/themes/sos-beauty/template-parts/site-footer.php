@@ -5,13 +5,12 @@
 
 defined( 'ABSPATH' ) || exit;
 
+$company   = sos_beauty_company();
 $site_name = get_bloginfo( 'name' );
-$address   = get_theme_mod( 'sos_beauty_footer_address', '123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh' );
-$hotline   = get_theme_mod( 'sos_beauty_footer_hotline', '0901 234 567' );
-$email     = get_theme_mod( 'sos_beauty_footer_email', 'support@jpbuydang.vn' );
-$bct_url   = get_theme_mod( 'sos_beauty_footer_bct_url', 'http://online.gov.vn' );
-
-$hotline_tel = preg_replace( '/\s+/', '', $hotline );
+$address   = $company['address'];
+$email     = $company['email'];
+$phones    = $company['phones'];
+$bct_url   = $company['bct_url'];
 
 $quick_links = array(
 	array(
@@ -42,16 +41,17 @@ $quick_links = array(
 				}
 				?>
 			</div>
+			<p class="beauty-site-footer__legal"><?php echo esc_html( $company['legal_name'] ); ?></p>
 			<?php if ( $address ) : ?>
 				<p class="beauty-site-footer__address"><?php echo esc_html( $address ); ?></p>
 			<?php endif; ?>
 			<ul class="beauty-site-footer__contact">
-				<?php if ( $hotline ) : ?>
+				<?php foreach ( $phones as $i => $phone ) : ?>
 					<li>
-						<span class="beauty-site-footer__label"><?php esc_html_e( 'Hotline', 'sos-beauty' ); ?></span>
-						<a href="<?php echo esc_url( 'tel:' . $hotline_tel ); ?>"><?php echo esc_html( $hotline ); ?></a>
+						<span class="beauty-site-footer__label"><?php echo 0 === $i ? esc_html__( 'Hotline', 'sos-beauty' ) : esc_html__( 'Điện thoại', 'sos-beauty' ); ?></span>
+						<a href="<?php echo esc_url( sos_beauty_tel_href( $phone ) ); ?>"><?php echo esc_html( $phone ); ?></a>
 					</li>
-				<?php endif; ?>
+				<?php endforeach; ?>
 				<?php if ( $email ) : ?>
 					<li>
 						<span class="beauty-site-footer__label"><?php esc_html_e( 'Email', 'sos-beauty' ); ?></span>

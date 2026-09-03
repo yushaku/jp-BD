@@ -9,15 +9,14 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
-$hotline   = get_theme_mod( 'sos_beauty_footer_hotline', '0901 234 567' );
-$email     = get_theme_mod( 'sos_beauty_footer_email', 'support@jpbuydang.vn' );
-$address   = get_theme_mod( 'sos_beauty_footer_address', '123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh' );
-$site_name = get_bloginfo( 'name' );
+$company   = sos_beauty_company();
+$hotline   = $company['hotline'];
+$email     = $company['email'];
+$address   = $company['address'];
+$facebook  = $company['facebook'];
+$site_name = $company['legal_name'];
 
-$phone_tel = preg_replace( '/\D+/', '', $hotline );
-if ( strlen( $phone_tel ) === 10 && '0' === $phone_tel[0] ) {
-	$phone_tel = '84' . substr( $phone_tel, 1 );
-}
+$phone_tel = sos_beauty_phone_intl( $hotline );
 
 $zalo = get_theme_mod( 'sos_beauty_float_zalo', '' );
 if ( ! $zalo && $phone_tel ) {
@@ -26,12 +25,28 @@ if ( ! $zalo && $phone_tel ) {
 
 $channels = array(
 	array(
+		'key'   => 'phone',
+		'label' => __( 'Hotline', 'sos-beauty' ),
+		'value' => $company['phones_display'],
+		'href'  => sos_beauty_tel_href( $hotline ),
+		'desc'  => __( 'Gọi điện để được tư vấn sản phẩm Nhật Bản chính hãng.', 'sos-beauty' ),
+		'icon'  => '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.5-1.1a2 2 0 0 1 2.1-.4c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/></svg>',
+	),
+	array(
 		'key'   => 'zalo',
 		'label' => __( 'Zalo', 'sos-beauty' ),
 		'value' => $hotline,
 		'href'  => $zalo,
 		'desc'  => __( 'Phù hợp khi cần gửi ảnh sản phẩm hoặc đơn hàng.', 'sos-beauty' ),
 		'icon'  => '<svg width="22" height="22" viewBox="0 0 48 48" aria-hidden="true"><path fill="currentColor" d="M24.1 6C13.5 6 5 13.6 5 23c0 5.1 2.5 9.7 6.5 12.8-.2.9-.8 3.4-1 4.1-.2.9.3 1.1 1.1.7.6-.3 3.5-2.1 4.9-3 1.5.4 3.1.6 4.7.6 10.6 0 19.1-7.6 19.1-17S34.7 6 24.1 6zm-6.9 18.6c0 .7-.6 1.3-1.3 1.3s-1.3-.6-1.3-1.3v-6.6c0-.7.6-1.3 1.3-1.3s1.3.6 1.3 1.3v6.6zm4.7 0c0 .7-.6 1.3-1.3 1.3s-1.3-.6-1.3-1.3v-6.6c0-.7.6-1.3 1.3-1.3s1.3.6 1.3 1.3v6.6zm6.8 1.3c-.7 0-1.3-.6-1.3-1.3v-3.4l-3.5 4.2c-.2.2-.5.4-.8.4h-.2c-.7 0-1.3-.6-1.3-1.3v-6.6c0-.7.6-1.3 1.3-1.3s1.3.6 1.3 1.3v3.4l3.5-4.2c.2-.2.5-.4.8-.4h.2c.7 0 1.3.6 1.3 1.3v6.6c0 .7-.6 1.3-1.3 1.3zm6.2-1.7c0 .9-.7 1.7-1.7 1.7h-2.6c-.7 0-1.3-.6-1.3-1.3s.6-1.3 1.3-1.3h1.3v-1.1h-1.3c-.7 0-1.3-.6-1.3-1.3s.6-1.3 1.3-1.3h1.3v-1.1h-1.3c-.7 0-1.3-.6-1.3-1.3s.6-1.3 1.3-1.3h2.6c.9 0 1.7.7 1.7 1.7v6.6z"/></svg>',
+	),
+	array(
+		'key'   => 'facebook',
+		'label' => __( 'Fanpage', 'sos-beauty' ),
+		'value' => __( 'hangnhatchomoinha.vn', 'sos-beauty' ),
+		'href'  => $facebook,
+		'desc'  => __( 'Theo dõi tin tức và sản phẩm Nhật Bản chính hãng.', 'sos-beauty' ),
+		'icon'  => '<svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H7v3h3v7h3v-7h3l1-3h-4v-2c0-.6.4-1 1-1z"/></svg>',
 	),
 	array(
 		'key'   => 'email',
@@ -45,12 +60,12 @@ $channels = array(
 
 $store_rows = array(
 	array(
-		'label' => __( 'Thương hiệu', 'sos-beauty' ),
+		'label' => __( 'Công ty', 'sos-beauty' ),
 		'value' => $site_name,
 	),
 	array(
 		'label' => __( 'Khu vực', 'sos-beauty' ),
-		'value' => __( 'TP. Hồ Chí Minh, Việt Nam', 'sos-beauty' ),
+		'value' => $company['region'],
 	),
 	array(
 		'label' => __( 'Giờ hỗ trợ', 'sos-beauty' ),
@@ -82,7 +97,7 @@ $store_rows = array(
 						<span class="beauty-contact__channel-icon" aria-hidden="true"><?php echo $channel['icon']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- inline SVG ?></span>
 						<span class="beauty-contact__channel-label"><?php echo esc_html( $channel['label'] ); ?></span>
 						<?php if ( ! empty( $channel['href'] ) ) : ?>
-							<a class="beauty-contact__channel-value" href="<?php echo esc_url( $channel['href'] ); ?>"<?php echo ( 'zalo' === $channel['key'] ) ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
+							<a class="beauty-contact__channel-value" href="<?php echo esc_url( $channel['href'] ); ?>"<?php echo in_array( $channel['key'], array( 'zalo', 'facebook' ), true ) ? ' target="_blank" rel="noopener noreferrer"' : ''; ?>>
 								<?php echo esc_html( $channel['value'] ); ?>
 							</a>
 						<?php else : ?>
@@ -131,7 +146,7 @@ $store_rows = array(
 		<h2 class="beauty-contact__map-title"><?php esc_html_e( 'Tìm chúng tôi trên bản đồ', 'sos-beauty' ); ?></h2>
 		<div class="beauty-contact__map-frame">
 			<iframe
-				src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4914.097430223508!2d105.83242422645456!3d21.036388654351345!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135aba15ec15d17%3A0x620e85c2cfe14d4c!2zTMSDbmcgQ2jhu6cgdOG7i2NoIEjhu5MgQ2jDrSBNaW5o!5e0!3m2!1svi!2s!4v1784399287596!5m2!1svi!2s"
+				src="<?php echo esc_url( $company['map_embed'] ); ?>"
 				title="<?php esc_attr_e( 'Bản đồ Google — vị trí cửa hàng', 'sos-beauty' ); ?>"
 				loading="lazy"
 				referrerpolicy="strict-origin-when-cross-origin"

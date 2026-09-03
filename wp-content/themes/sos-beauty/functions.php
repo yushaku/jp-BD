@@ -5,7 +5,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'SOS_BEAUTY_VERSION', '1.11.45' );
+define( 'SOS_BEAUTY_VERSION', '1.11.63' );
+
+require_once get_stylesheet_directory() . '/inc/company.php';
 
 /**
  * Brand logo / favicon paths (theme assets).
@@ -215,6 +217,14 @@ function sos_beauty_enqueue_scripts() {
 		'sos-beauty-header-scroll',
 		$uri . '/assets/js/header-scroll.js',
 		array(),
+		SOS_BEAUTY_VERSION,
+		true
+	);
+
+	wp_enqueue_script(
+		'sos-beauty-header-mobile-nav',
+		$uri . '/assets/js/header-mobile-nav.js',
+		array( 'storefront-navigation' ),
 		SOS_BEAUTY_VERSION,
 		true
 	);
@@ -1582,19 +1592,23 @@ function sos_beauty_footer_customize( $wp_customize ) {
 
 	$fields = array(
 		'sos_beauty_footer_address' => array(
-			'default' => '123 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh',
+			'default' => SOS_BEAUTY_COMPANY['address'],
 			'label'   => 'Địa chỉ công ty',
 		),
 		'sos_beauty_footer_hotline' => array(
-			'default' => '0901 234 567',
-			'label'   => 'Hotline (float phone + Zalo mặc định)',
+			'default' => SOS_BEAUTY_COMPANY['phone_1'],
+			'label'   => 'Hotline 1 (float phone + Zalo mặc định)',
+		),
+		'sos_beauty_footer_phone_2' => array(
+			'default' => SOS_BEAUTY_COMPANY['phone_2'],
+			'label'   => 'Hotline 2',
 		),
 		'sos_beauty_footer_email'   => array(
-			'default' => 'support@jpbuydang.vn',
+			'default' => SOS_BEAUTY_COMPANY['email'],
 			'label'   => 'Email',
 		),
 		'sos_beauty_footer_bct_url' => array(
-			'default' => 'http://online.gov.vn',
+			'default' => SOS_BEAUTY_COMPANY['bct_url'],
 			'label'   => 'Link Bộ Công Thương',
 		),
 		'sos_beauty_float_zalo'     => array(
@@ -1602,8 +1616,8 @@ function sos_beauty_footer_customize( $wp_customize ) {
 			'label'   => 'Zalo URL (để trống = zalo.me/hotline)',
 		),
 		'sos_beauty_float_facebook' => array(
-			'default' => 'https://www.facebook.com/',
-			'label'   => 'Facebook / Messenger URL',
+			'default' => SOS_BEAUTY_COMPANY['facebook'],
+			'label'   => 'Facebook / Fanpage URL',
 		),
 	);
 

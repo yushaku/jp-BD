@@ -27,8 +27,9 @@
   --jp-vermillion-soft: var(--jp-primary);
   --jp-cta: var(--jp-primary);
   --jp-cta-hover: var(--jp-primary-hover);
-  --jp-footer-text: #f9fafb;
-  --jp-footer-muted: #d1d5db;
+  --jp-footer-bg: #eef0f5;
+  --jp-footer-text: #1f2937;
+  --jp-footer-muted: #6b7280;
   --jp-radius: 8px;
   --jp-radius-lg: 16px;
   --jp-radius-card: var(--jp-radius-lg);

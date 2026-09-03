@@ -7,8 +7,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$hotline = get_theme_mod( 'sos_beauty_footer_hotline', '0901 234 567' );
-$tel     = preg_replace( '/\s+/', '', $hotline );
+$hotline = sos_beauty_company( 'hotline' );
+$tel     = preg_replace( '/\D+/', '', $hotline );
 ?>
 <div class="beauty-header-main">
 	<div class="beauty-header-main__brand">

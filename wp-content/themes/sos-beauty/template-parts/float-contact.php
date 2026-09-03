@@ -5,19 +5,17 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$phone_raw = get_theme_mod( 'sos_beauty_footer_hotline', '0901 234 567' );
-$phone_tel = preg_replace( '/\D+/', '', $phone_raw );
-if ( strlen( $phone_tel ) === 10 && '0' === $phone_tel[0] ) {
-	$phone_tel = '84' . substr( $phone_tel, 1 );
-}
+$company   = sos_beauty_company();
+$phone_raw = $company['hotline'];
+$phone_tel = sos_beauty_phone_intl( $phone_raw );
 
 $zalo = get_theme_mod( 'sos_beauty_float_zalo', '' );
 if ( ! $zalo && $phone_tel ) {
 	$zalo = 'https://zalo.me/' . $phone_tel;
 }
 
-$facebook = get_theme_mod( 'sos_beauty_float_facebook', 'https://www.facebook.com/' );
-$phone_href = $phone_tel ? 'tel:+' . $phone_tel : '';
+$facebook   = $company['facebook'];
+$phone_href = sos_beauty_tel_href( $phone_raw );
 
 $items = array();
 

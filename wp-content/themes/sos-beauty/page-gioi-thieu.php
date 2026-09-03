@@ -19,9 +19,10 @@ the_post();
 
 $post_id   = get_the_ID();
 $site_name = get_bloginfo( 'name' );
-$address   = get_theme_mod( 'sos_beauty_footer_address', 'Tầng 1, CT2, Mễ Trì Thượng, Nam Từ Liêm, Hà Nội' );
-$email     = get_theme_mod( 'sos_beauty_footer_email', 'jpbuidangco.ltd@gmail.com' );
-$hotline   = get_theme_mod( 'sos_beauty_footer_hotline', '098 556 1862' );
+$company   = sos_beauty_company();
+$address   = $company['address'];
+$email     = $company['email'];
+$hotline   = $company['hotline'];
 $shop_url  = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : home_url( '/shop/' );
 $contact   = get_page_by_path( 'lien-he' );
 $contact_url = $contact ? get_permalink( $contact ) : home_url( '/lien-he/' );
